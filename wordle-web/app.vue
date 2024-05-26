@@ -10,9 +10,40 @@
 
         <v-btn @click="router.push('/')">Home</v-btn>
         <v-btn @click="router.push('/test')">Test</v-btn>
-        <v-btn icon="mdi-theme-light-dark" @click="toggleTheme" />
-        <v-btn icon="mdi-help-circle" @click="showHelpDialog = true" />
-        <HelpDialog v-model="showHelpDialog" />
+        <v-menu>
+          <template v-slot:activator="{ props }">
+            <v-btn v-bind="props"> <v-icon>mdi-account</v-icon> </v-btn>
+          </template>
+          <v-card>
+            <v-card-text>
+              <v-btn
+              v-if="!tokenService.isLoggedIn()"
+                @click="showLoginDialog = true"
+                class="mb-5"
+                flat
+                color="primary"
+              >
+                <v-icon> mdi-lock </v-icon>
+                Login
+              </v-btn>
+              <div v-else>
+                {{  tokenService.getUserName() }}
+              </div>
+              <br />
+              <v-btn @click="toggleTheme" class="mb-5" flat color="primary">
+                <v-icon> mdi-theme-light-dark </v-icon>
+                Theme
+              </v-btn>
+              <br />
+              <v-btn @click="showHelpDialog = true" flat color="primary">
+                <v-icon> mdi-help-circle </v-icon>
+                Help
+              </v-btn>
+            </v-card-text>
+          </v-card>
+          <HelpDialog v-model="showHelpDialog" />
+        </v-menu>
+        <SigninDialog v-model="showLoginDialog" />
       </v-app-bar>
       <v-main>
         <NuxtPage />
@@ -24,10 +55,14 @@
 <script setup lang="ts">
 import { useTheme } from "vuetify";
 import nuxtStorage from "nuxt-storage";
+import TokenService from "@/scripts/TokenService";
 
 const router = useRouter();
 const theme = useTheme();
 const showHelpDialog = ref(false);
+const showLoginDialog = ref(false);
+
+const tokenService = new TokenService();
 
 onMounted(() => {
   var defaultTheme = nuxtStorage.localStorage.getData("theme");
