@@ -285,7 +285,8 @@ You should now be ready to follow along in class on Tuesday.
   - Add a door collider
   - Add IA_Action
   - Add a timeline and lerp
-  - Make it open both ways. 
+  - Make it open both ways.
+  - Select block
   - Collider to light up an object when close
 - Pick up an object: https://www.youtube.com/watch?v=Ak-A4E1pTHo 
 
@@ -303,4 +304,6 @@ You should now be ready to follow along in class on Tuesday.
     - Menus
     - Tooltips 
 
-## Finals Week
+## Final
+- 3:30pm on Thursday, 6/13/2024
+
