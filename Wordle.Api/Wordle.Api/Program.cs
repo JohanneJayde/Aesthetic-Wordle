@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System;
 using System.Text;
 using Wordle.Api;
 using Wordle.Api.Identity;
@@ -95,8 +94,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 //Add Policies
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy(Policies.RandomAdmin, Policies.RandomAdminPolicy);
-    //options.AddPolicy("IsGrantPolicy", policy => policy.RequireRole("Grant"));
     options.AddPolicy(Policies.AddOrDeleteWord, Policies.AddOrDeleteWordPolicy);
 });
 

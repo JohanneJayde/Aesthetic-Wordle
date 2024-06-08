@@ -108,7 +108,6 @@ public class GameService(WordleDbContext db)
             };
         }
 
-
         return stats;
     }
 

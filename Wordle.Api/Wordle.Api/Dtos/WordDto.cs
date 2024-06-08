@@ -1,9 +1,8 @@
-﻿namespace Wordle.Api.Dtos
-{
-    public class WordDto
-    {
+﻿namespace Wordle.Api.Dtos;
 
-        public string Word { get; set; } = null!;
-        public bool IsCommonWord { get; set; }
-    }
+public class WordDto
+{
+    public string Word { get; set; } = null!;
+    public bool IsCommonWord { get; set; }
 }
+

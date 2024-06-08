@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using System.Data;
 using System.Security.Claims;
-using System;
 using Wordle.Api.Models;
 
 namespace Wordle.Api.Identity;

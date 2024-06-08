@@ -5,6 +5,7 @@ using Wordle.Api.Identity;
 using Wordle.Api.Services;
 
 namespace Wordle.Api.Controllers;
+
 [ApiController]
 [Route("[controller]")]
 public class WordController(WordOfTheDayService wordOfTheDayService, WordEditorService wordEditorService) : ControllerBase

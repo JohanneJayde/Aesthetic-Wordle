@@ -24,6 +24,5 @@ public class StatisticsService(WordleDbContext db)
 
         return stats;
     }
-
 }
 

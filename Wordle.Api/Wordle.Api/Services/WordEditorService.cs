@@ -30,7 +30,6 @@ public class WordEditorService(WordleDbContext Db)
 
             await Db.SaveChangesAsync();
         }
-
     }
 
     public async Task AddWord(WordDto wordToAdd)
@@ -50,6 +49,5 @@ public class WordEditorService(WordleDbContext Db)
 
         await Db.SaveChangesAsync();
     }
-
 }
 
