@@ -6,12 +6,12 @@ name: Build and deploy ASP.Net Core app to Azure Web App - AestheticWordle
 on:
   push:
     branches:
-      - Assignment5
+      - main
     paths:
       - Wordle.Api/**
   pull_request:
     branches:
-      - Assignemnt5
+      - main
   workflow_dispatch:
 
 jobs:
