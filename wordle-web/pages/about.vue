@@ -12,7 +12,7 @@ import { useDisplay } from 'vuetify/lib/framework.mjs';
         max-width="240"
         max-height="130"
         class="mx-auto"
-      ></v-img>
+      />
 
       <v-card-text
         :class="[
