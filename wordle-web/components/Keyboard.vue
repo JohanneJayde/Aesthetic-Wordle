@@ -25,8 +25,10 @@
 import { Game } from "~/scripts/game";
 import { Letter } from "~/scripts/letter";
 import { playClickSound, playEnterSound } from "~/scripts/soundUtils";
+import nuxtStorage from "nuxt-storage";
 
 const game: Game | undefined = inject("GAME");
+const volume = ref(0.5);
 
 const keyboardLetterRows = computed(() => {
   let keyboardLetterRows: Letter[][] = [];
@@ -52,9 +54,14 @@ const keyboardLetterRows = computed(() => {
 });
 
 const handleLetterClick = (letter: Letter) => {
-  playClickSound();
+  playClickSound(volume.value);
   if (letter.char === "ENTER") {
-    playEnterSound();
+    playEnterSound(volume.value);
   }
 };
+
+onMounted(async () => {
+  const storedVolume = await nuxtStorage.localStorage.getData("audioVolume");
+  volume.value = storedVolume ? storedVolume : 0;
+});
 </script>

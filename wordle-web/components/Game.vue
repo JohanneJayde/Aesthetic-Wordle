@@ -8,7 +8,7 @@
     <v-sheet v-else color="transparent">
       <div
         v-if="isDaily"
-        class="font-text text-center text-wrap text-white font-weight-bold mb-3"
+        class="font-text text-primary text-center text-wrap font-weight-bold mb-3"
       >
         Daily Wordle: {{ formattedDate }}
       </div>
@@ -199,18 +199,7 @@ const showNameDialog = ref(false);
 const validWordsNum = ref(0);
 const itemSelect = ref("");
 const date = route.query.date?.toString();
-
-watch(itemSelect, () => {
-  if (itemSelect.value === "showNameDialog") {
-    showNameDialog.value = true;
-  } else if (itemSelect.value === "showWordsList") {
-    showWordsList.value = true;
-  } else if (itemSelect.value === "showResult") {
-    isGameOver.value = true;
-  }
-
-  itemSelect.value = "";
-});
+const volumne = ref(0.5);
 
 const game = reactive(new Game());
 provide("GAME", game);
@@ -267,6 +256,44 @@ async function saveScore() {
   }).catch((err) => console.log(err));
 }
 
+function onKeyup(event: KeyboardEvent) {
+  if (showWordsList.value) {
+    return;
+  }
+  if (showNameDialog.value) {
+    return;
+  }
+  if (event.key === "Enter") {
+    let currentGuessIndex = game.guessIndex;
+    game.submitGuess(playerName.value, stopwatch.value.getCurrentTime());
+    if (currentGuessIndex !== game.guessIndex) {
+      playEnterSound(volumne.value);
+    }
+  } else if (event.key == "Backspace") {
+    playClickSound(volumne.value);
+    game.removeLastLetter();
+  } else if (event.key.match(/[A-z]/) && event.key.length === 1) {
+    playClickSound(volumne.value);
+    game.addLetter(event.key.toUpperCase());
+  }
+}
+
+const formattedDate = computed(() => {
+  return dateUtils.getFormattedDateWithOrdianl(addDays(new Date(date!), 1));
+});
+
+watch(itemSelect, () => {
+  if (itemSelect.value === "showNameDialog") {
+    showNameDialog.value = true;
+  } else if (itemSelect.value === "showWordsList") {
+    showWordsList.value = true;
+  } else if (itemSelect.value === "showResult") {
+    isGameOver.value = true;
+  }
+
+  itemSelect.value = "";
+});
+
 watch(showNameDialog, () => {
   if (playerName.value === "") {
     playerName.value = "Guest";
@@ -280,14 +307,14 @@ watch(
   (newState) => {
     switch (newState) {
       case GameState.Won:
-        playWinSound();
+        playWinSound(volumne.value);
         stopwatch.value.stop();
         saveScore();
         isGameOver.value = true;
         break;
 
       case GameState.Lost:
-        playLoseSound();
+        playLoseSound(volumne.value);
         stopwatch.value.stop();
         isGameOver.value = true;
         break;
@@ -301,7 +328,9 @@ watch(
 
 onMounted(async () => {
   window.addEventListener("keyup", onKeyup);
-  const defaultName = nuxtStorage.localStorage.getData("name");
+  const defaultName = await nuxtStorage.localStorage.getData("name");
+  volumne.value =
+    (await nuxtStorage.localStorage.getData("audioVolume")) ?? 0.5;
   showNameDialog.value = defaultName === null || defaultName === "Guest";
   playerName.value = showNameDialog.value ? "Guest" : defaultName;
   stopwatch.value.start();
@@ -315,32 +344,6 @@ onMounted(async () => {
 
 onUnmounted(() => {
   window.removeEventListener("keyup", onKeyup);
-});
-
-function onKeyup(event: KeyboardEvent) {
-  if (showWordsList.value) {
-    return;
-  }
-  if (showNameDialog.value) {
-    return;
-  }
-  if (event.key === "Enter") {
-    let currentGuessIndex = game.guessIndex;
-    game.submitGuess(playerName.value, stopwatch.value.getCurrentTime());
-    if (currentGuessIndex !== game.guessIndex) {
-      playEnterSound();
-    }
-  } else if (event.key == "Backspace") {
-    playClickSound();
-    game.removeLastLetter();
-  } else if (event.key.match(/[A-z]/) && event.key.length === 1) {
-    playClickSound();
-    game.addLetter(event.key.toUpperCase());
-  }
-}
-
-const formattedDate = computed(() => {
-  return dateUtils.getFormattedDateWithOrdianl(addDays(new Date(date!), 1));
 });
 </script>
 

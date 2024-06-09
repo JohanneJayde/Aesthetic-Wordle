@@ -15,14 +15,16 @@
       width="75%"
     />
     <v-card rounded v-else>
-      <v-sheet color="primary">
-        <v-card-title class="text-center text-h5">
-          <v-icon class="rotate2d" color="secondary">mdi-star</v-icon>
-          Leaderboard
-          <v-icon class="rotate2d" color="secondary">mdi-star</v-icon>
-        </v-card-title>
-      </v-sheet>
       <v-table density="comfortable">
+        <template v-slot:top>
+          <v-sheet color="primary">
+            <v-card-title class="text-center text-h5">
+              <v-icon class="rotate2d" color="secondary">mdi-star</v-icon>
+              Leaderboard
+              <v-icon class="rotate2d" color="secondary">mdi-star</v-icon>
+            </v-card-title>
+          </v-sheet>
+        </template>
         <thead>
           <tr>
             <th
@@ -49,11 +51,8 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(player, i) in players" :key="i" class="bg-background">
-            <td
-              style="position: sticky; left: 0"
-              class="text-center bg-background"
-            >
+          <tr v-for="(player, i) in players" :key="i">
+            <td style="position: sticky; left: 0" class="text-center">
               <v-icon v-if="i < 3" :class="[getTrophyColor(i), 'rotate']"
                 >mdi-trophy</v-icon
               >
@@ -61,18 +60,15 @@
               <span v-else>{{ i + 1 }}</span>
             </td>
 
-            <td
-              style="position: sticky; left: 50px"
-              class="text-center bg-background"
-            >
+            <td style="position: sticky; left: 50px" class="text-center">
               {{ player.name }}
             </td>
 
-            <td class="text-center bg-background">{{ player.gameCount }}</td>
-            <td class="text-center bg-background">
+            <td class="text-center">{{ player.gameCount }}</td>
+            <td class="text-center">
               {{ player.averageAttempts.toFixed(2) }}
             </td>
-            <td class="text-center bg-background">
+            <td class="text-center">
               {{ player.averageSeconds.toFixed(2) }}
             </td>
             <v-sheet color="primary" height="5px" />

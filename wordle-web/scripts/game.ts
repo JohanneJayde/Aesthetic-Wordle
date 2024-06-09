@@ -1,4 +1,3 @@
-import axios from "~/plugins/axios";
 import { LetterState, type Letter } from "./letter";
 import { Word } from "./word";
 import Axios from "axios";
