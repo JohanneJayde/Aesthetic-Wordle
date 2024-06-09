@@ -105,6 +105,4 @@ const key = {
     new Letter("Wrong", LetterState.Wrong),
   ],
 };
-
-const currentPage = ref(0);
 </script>

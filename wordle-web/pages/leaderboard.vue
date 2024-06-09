@@ -14,14 +14,15 @@
       rounded
       width="75%"
     />
-    <v-card variant="flat" class="pa-3 bg-secondary" v-else>
-      <v-card-title class="text-center text-h5 mb-3">
-        <v-icon class="rotate2d" color="primary">mdi-star</v-icon>
-        Leaderboard
-        <v-icon class="rotate2d" color="primary">mdi-star</v-icon>
-      </v-card-title>
-
-      <v-table>
+    <v-card rounded v-else>
+      <v-sheet color="primary">
+        <v-card-title class="text-center text-h5">
+          <v-icon class="rotate2d" color="secondary">mdi-star</v-icon>
+          Leaderboard
+          <v-icon class="rotate2d" color="secondary">mdi-star</v-icon>
+        </v-card-title>
+      </v-sheet>
+      <v-table density="comfortable">
         <thead>
           <tr>
             <th
@@ -74,17 +75,11 @@
             <td class="text-center bg-background">
               {{ player.averageSeconds.toFixed(2) }}
             </td>
+            <v-sheet color="primary" height="5px" />
           </tr>
         </tbody>
       </v-table>
-      <v-card-actions class="d-flex justify-center my-1">
-        <v-btn
-          color="white"
-          class="bg-primary pa-2 px-5"
-          to="/"
-          text="Go Home"
-        />
-      </v-card-actions>
+      <v-sheet color="primary" height="5px" />
     </v-card>
   </v-container>
 </template>
