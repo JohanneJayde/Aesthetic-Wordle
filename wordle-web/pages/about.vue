@@ -19,18 +19,11 @@ import { useDisplay } from 'vuetify/lib/framework.mjs';
           $vuetify.display.smAndDown ? 'text-body-1' : '',
           'text-h6 text-cente ma-2',
         ]"
-        >This class project is about exploring more of Vue's features and using
-        Axios for routes. We added a SQL database and various controllers to the
-        back end! We added a leaderboard to the game and played with animations
-        and more styling. Meg is amazing and someone we look up to as women in
-        CS <v-icon small class="text-red">mdi-heart</v-icon> She does a great
-        job explaining things in class, and we really appreciate her immense
-        knowledge!
-      </v-card-text>
-      <v-card-text>
-        <span class="text-white text-h5 bg-primary pa-1">
-          #MEGFORPRESIDENT
-        </span>
+      >
+        Wordle is a poetic journey through language, where each guess paints a
+        delicate picture of meaning on the canvas of possibility, revealing the
+        hidden hues of words until the final stroke unveils the masterpiece of
+        understanding. Just start guessing and the magic begins!
       </v-card-text>
       <v-card-actions class="d-flex justify-center mb-1">
         <v-btn
