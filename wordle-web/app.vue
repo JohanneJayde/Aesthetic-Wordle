@@ -1,9 +1,20 @@
 <template>
   <v-app v-if="themeLoaded" class="full-page-gradient">
     <v-app-bar class="bg-primary" :elevation="2">
-      <v-app-bar-title @click="$router.push('/')" style="cursor: pointer">
-        <v-img :src="logoPath" alt="Logo" max-width="150" max-height="70" />
-      </v-app-bar-title>
+      <template v-slot:prepend>
+        <v-app-bar-nav-icon variant="text" @click="drawer = !drawer" />
+      </template>
+      <v-img
+        :src="logoPath"
+        alt="Logo"
+        min-width="130"
+        min-height="60"
+        max-width="150"
+        max-height="80"
+        @click="$router.push('/')"
+        style="cursor: pointer"
+      />
+      <v-app-bar-title> </v-app-bar-title>
 
       <v-btn v-if="$vuetify.display.smAndUp" @click="showLoginLogOut">
         {{ tokenService.isLoggedIn() ? tokenService.getUserName() : "Log In" }}
@@ -19,27 +30,25 @@
         @click="$router.push('/Instructions')"
       />
       <v-app-bar-nav-icon icon="mdi-cog" @click="showSettingsDialog = true" />
-      <v-app-bar-nav-icon variant="text" @click="drawer = !drawer" />
     </v-app-bar>
     <v-navigation-drawer
       v-model="drawer"
-      location="right"
+      location="left"
       color="secondary"
       temporary
     >
-      <v-list
-        v-for="item in [
-          'Daily Wordle',
-          'Random Wordle',
-          'About',
-          'Leaderboard',
-          'Instructions',
-          'Latest Wordles',
-          'Word Editor',
-        ]"
-        :key="item"
-      >
+      <v-list>
         <v-list-item
+          v-for="item in [
+            'Daily Wordle',
+            'Random Wordle',
+            'About',
+            'Leaderboard',
+            'Instructions',
+            'Latest Wordles',
+            'Word Editor',
+          ]"
+          :key="item"
           @click="
             if (item === 'Daily Wordle') {
               $router.push(
@@ -50,7 +59,9 @@
             } else $router.push('/' + item.replaceAll(' ', ''));
           "
         >
-          <v-list-item-title> {{ item }} </v-list-item-title>
+          <v-list-item-title class="text-button">
+            {{ item }}
+          </v-list-item-title>
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
