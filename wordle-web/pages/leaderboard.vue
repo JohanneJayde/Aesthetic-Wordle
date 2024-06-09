@@ -14,7 +14,7 @@
       rounded
       width="75%"
     />
-    <v-card rounded v-else>
+    <v-card rounded v-else elevation="5">
       <v-table density="comfortable">
         <template v-slot:top>
           <v-sheet color="primary">
@@ -52,7 +52,10 @@
         </thead>
         <tbody>
           <tr v-for="(player, i) in players" :key="i">
-            <td style="position: sticky; left: 0" class="text-center">
+            <td
+              style="position: sticky; left: 0"
+              class="text-center bg-surface"
+            >
               <v-icon v-if="i < 3" :class="[getTrophyColor(i), 'rotate']"
                 >mdi-trophy</v-icon
               >
@@ -60,7 +63,10 @@
               <span v-else>{{ i + 1 }}</span>
             </td>
 
-            <td style="position: sticky; left: 50px" class="text-center">
+            <td
+              style="position: sticky; left: 50px"
+              class="text-center bg-surface"
+            >
               {{ player.name }}
             </td>
 
