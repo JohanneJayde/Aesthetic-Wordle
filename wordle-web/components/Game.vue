@@ -192,6 +192,8 @@ const props = withDefaults(
 );
 
 const route = useRoute();
+const gameMessage = ref("");
+const gameStateColor = ref("");
 const showWordsList = ref(false);
 const isGameOver = ref(false);
 const playerName = ref("");
@@ -222,28 +224,6 @@ function closeGameDialog() {
   stopwatch.value.start();
 }
 
-const gameMessage = computed(() => {
-  switch (game.gameState) {
-    case GameState.Won:
-      return "Congratulations! You won! 🥳";
-    case GameState.Lost:
-      return "You lost! Better luck next time! 😭";
-    default:
-      return "Giving up already? 🤔";
-  }
-});
-
-const gameStateColor = computed(() => {
-  switch (game.gameState) {
-    case GameState.Won:
-      return "win";
-    case GameState.Lost:
-      return "lose";
-    default:
-      return "play";
-  }
-});
-
 async function saveScore() {
   let scoreUrl = "player/saveScore";
   let data = {
@@ -252,7 +232,7 @@ async function saveScore() {
     seconds: stopwatch.value.getCurrentTime(),
   };
   await Axios.post(scoreUrl, data, {
-    headers: { "Content-Type": "application/json" }, // config
+    headers: { "Content-Type": "application/json" },
   }).catch((err) => console.log(err));
 }
 
@@ -285,6 +265,8 @@ watch(
   (newState) => {
     switch (newState) {
       case GameState.Won:
+        gameMessage.value = "Congratulations! You won! 🥳";
+        gameStateColor.value = "win";
         playWinSound(volumne.value);
         stopwatch.value.stop();
         saveScore();
@@ -292,12 +274,16 @@ watch(
         break;
 
       case GameState.Lost:
+        gameMessage.value = "You lost! Better luck next time! 😭";
+        gameStateColor.value = "lose";
         playLoseSound(volumne.value);
         stopwatch.value.stop();
         isGameOver.value = true;
         break;
 
       case GameState.Playing:
+        gameMessage.value = "Giving up already? 🤔";
+        gameStateColor.value = "play";
         isGameOver.value = false;
         break;
     }
