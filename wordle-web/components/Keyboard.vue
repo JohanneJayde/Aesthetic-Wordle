@@ -24,7 +24,6 @@
 <script setup lang="ts">
 import { Game } from "~/scripts/game";
 import { Letter } from "~/scripts/letter";
-import { playClickSound, playEnterSound } from "~/scripts/soundUtils";
 import nuxtStorage from "nuxt-storage";
 
 const game: Game | undefined = inject("GAME");
@@ -57,23 +56,18 @@ const keyboardLetterRows = computed(() => {
 });
 
 function onKeyup(event: KeyboardEvent) {
-  console.log(event.key);
   if (
-    !event.key.match(/[A-z]/) &&
-    event.key.length !== 1 &&
+    !event.key.match(/^[a-zA-Z]$/) &&
     event.key !== "Enter" &&
     event.key !== "Backspace"
-  )
+  ) {
     return;
-
-  emit("keyup", event.key.toUpperCase());
+  } else {
+    emit("keyup", event.key.toUpperCase());
+  }
 }
 
 const handleLetterClick = (letter: Letter) => {
-  playClickSound(volume.value);
-  if (letter.char === "ENTER") {
-    playEnterSound(volume.value);
-  }
   emit("keyup", letter.char);
 };
 
