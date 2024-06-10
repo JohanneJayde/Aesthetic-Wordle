@@ -14,7 +14,7 @@
       </div>
       <div
         v-else
-        class="font-text text-center text-wrap text-white font-weight-bold mb-3"
+        class="font-text text-primary text-center text-wrap font-weight-bold mb-3"
       >
         Random Wordle
       </div>
@@ -152,11 +152,27 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-      <NameDialog v-model:show="showNameDialog" v-model:name="playerName" />
-      <WordList v-model="showWordsList" @validWordsUpdate="captureValidWords" />
+      <NameDialog
+        @keyup.stop
+        v-model:show="showNameDialog"
+        v-model:name="playerName"
+      />
+      <WordList
+        @keyup.stop
+        v-model="showWordsList"
+        @validWordsUpdate="captureValidWords"
+      />
     </v-sheet>
   </v-container>
 </template>
+
+<style scoped>
+@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
+
+.font-text {
+  font-family: "Press Start 2P", sans-serif;
+}
+</style>
 
 <script setup lang="ts">
 import { Game, GameState } from "../scripts/game";
@@ -291,12 +307,6 @@ watch(
 );
 
 function handleClick(value: string) {
-  if (showWordsList.value) {
-    return;
-  }
-  if (showNameDialog.value) {
-    return;
-  }
   if (value === "ENTER") {
     let currentGuessIndex = game.guessIndex;
     game.submitGuess(playerName.value, stopwatch.value.getCurrentTime());
@@ -327,11 +337,3 @@ onMounted(async () => {
   }
 });
 </script>
-
-<style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap");
-
-.font-text {
-  font-family: "Press Start 2P", sans-serif;
-}
-</style>
