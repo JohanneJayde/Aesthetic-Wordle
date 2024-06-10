@@ -59,7 +59,7 @@ const keyboardLetterRows = computed(() => {
 function onKeyup(event: KeyboardEvent) {
   console.log(event.key);
   if (
-    event.key.match(/[A-z]/) &&
+    !event.key.match(/[A-z]/) &&
     event.key.length !== 1 &&
     event.key !== "Enter" &&
     event.key !== "Backspace"
