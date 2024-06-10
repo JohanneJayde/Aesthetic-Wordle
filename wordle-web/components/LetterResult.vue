@@ -11,7 +11,6 @@
       correctState(letter.state),
       'align-center d-flex justify-center',
     ]"
-    @click="onClicked()"
   >
     {{ letter.char }}
   </v-card>
@@ -78,17 +77,6 @@ const game: Game | undefined = inject("GAME");
 const boxSize = ref(60);
 const display = useDisplay();
 const keySize = ref(40);
-function onClicked() {
-  if (!game) return;
-
-  if (props.letter.char === "👈") {
-    game.removeLastLetter();
-  } else if (props.letter.char === "ENTER") {
-    game.submitGuess();
-  } else {
-    game.addLetter(props.letter.char.toUpperCase());
-  }
-}
 
 function correctState(letterState: LetterState) {
   switch (letterState) {

@@ -126,7 +126,7 @@
         </v-btn>
       </v-bottom-navigation>
 
-      <Keyboard />
+      <Keyboard @keyup="handleClick" />
 
       <v-dialog v-model="isGameOver" class="mx-auto" max-width="500">
         <v-card
@@ -256,28 +256,6 @@ async function saveScore() {
   }).catch((err) => console.log(err));
 }
 
-function onKeyup(event: KeyboardEvent) {
-  if (showWordsList.value) {
-    return;
-  }
-  if (showNameDialog.value) {
-    return;
-  }
-  if (event.key === "Enter") {
-    let currentGuessIndex = game.guessIndex;
-    game.submitGuess(playerName.value, stopwatch.value.getCurrentTime());
-    if (currentGuessIndex !== game.guessIndex) {
-      playEnterSound(volumne.value);
-    }
-  } else if (event.key == "Backspace") {
-    playClickSound(volumne.value);
-    game.removeLastLetter();
-  } else if (event.key.match(/[A-z]/) && event.key.length === 1) {
-    playClickSound(volumne.value);
-    game.addLetter(event.key.toUpperCase());
-  }
-}
-
 const formattedDate = computed(() => {
   return dateUtils.getFormattedDateWithOrdianl(addDays(new Date(date!), 1));
 });
@@ -326,8 +304,29 @@ watch(
   }
 );
 
+function handleClick(value: string) {
+  if (showWordsList.value) {
+    return;
+  }
+  if (showNameDialog.value) {
+    return;
+  }
+  if (value === "ENTER") {
+    let currentGuessIndex = game.guessIndex;
+    game.submitGuess(playerName.value, stopwatch.value.getCurrentTime());
+    if (currentGuessIndex !== game.guessIndex) {
+      playEnterSound(volumne.value);
+    }
+  } else if (value === "👈" || value === "BACKSPACE") {
+    playClickSound(volumne.value);
+    game.removeLastLetter();
+  } else {
+    playClickSound(volumne.value);
+    game.addLetter(value);
+  }
+}
+
 onMounted(async () => {
-  window.addEventListener("keyup", onKeyup);
   const defaultName = await nuxtStorage.localStorage.getData("name");
   volumne.value =
     (await nuxtStorage.localStorage.getData("audioVolume")) ?? 0.5;
@@ -340,10 +339,6 @@ onMounted(async () => {
   } else {
     option.value = null;
   }
-});
-
-onUnmounted(() => {
-  window.removeEventListener("keyup", onKeyup);
 });
 </script>
 
