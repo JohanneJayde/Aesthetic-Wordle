@@ -98,5 +98,28 @@ public class TokenController : ControllerBase
         }
         return Unauthorized("The username or password is incorrect"); // When do we give info back to the user? Pros/Cons?
     }
+
+    [HttpPost("Register")]
+    public async Task<IActionResult> Register([FromBody] AccountRegistrationDto accountRegistrationInfo)
+    {
+
+        AppUser appUser = new AppUser()
+        {
+            UserName = accountRegistrationInfo.Username,
+            Email = accountRegistrationInfo.Email,
+        };
+
+        var result = await _userManager.CreateAsync(appUser, accountRegistrationInfo.Password);
+
+        if(result.Succeeded)
+        {
+            return Ok("Okay");
+        }
+        else
+        {
+            return BadRequest("Not signed up");
+        }
+
+    }
 }
 
