@@ -1,5 +1,5 @@
 <template>
-  <v-dialog v-model="modelValue" width="500">
+  <v-dialog v-model="modelValue" width="500" @update:model-value="close">
     <v-card>
       <v-sheet color="primary mb-3">
         <v-card-title class="text-wrap">Sign in</v-card-title>
@@ -157,7 +157,7 @@ function signIn() {
     })
     .then((response) => {
       tokenService.setToken(response.data.token);
-      modelValue.value = false;
+      close();
       router.push("/");
     })
     .catch((error) => {
@@ -185,6 +185,7 @@ function register() {
 function close() {
   userName.value = "";
   password.value = "";
+  email.value = "";
   modelValue.value = false;
 }
 </script>
