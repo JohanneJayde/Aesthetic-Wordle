@@ -4,9 +4,9 @@ using Wordle.Api.Models;
 
 namespace Wordle.Api.Services;
 
-public class WordEditorService(WordleDbContext Db)
+public class WordEditorService(AppDbContext Db)
 {
-    public WordleDbContext Db { get; set; } = Db;
+    public AppDbContext Db { get; set; } = Db;
 
     public async Task DeleteWord(string Word)
     {

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Wordle.Api.Models;
 
-public class WordleDbContext : IdentityDbContext<AppUser>
+public class AppDbContext : IdentityDbContext<AppUser>
 {
     public DbSet<WordOfTheDay> WordsOfTheDays { get; set; }
     public DbSet<Game> Games { get; set; }
@@ -11,7 +11,7 @@ public class WordleDbContext : IdentityDbContext<AppUser>
 
     public DbSet<Player> Players { get; set; }
         
-    public WordleDbContext(DbContextOptions<WordleDbContext> options)
+    public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)
     {
     }

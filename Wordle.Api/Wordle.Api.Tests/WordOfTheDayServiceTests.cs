@@ -21,7 +21,7 @@ public class WordOfTheDayServiceTests : DatabaseTestBase
     public void GetWordOfTheDay_SameWord()
     {
         // Arrange
-        using var context = new WordleDbContext(Options);
+        using var context = new AppDbContext(Options);
         WordOfTheDayService service = new(context);
         DateOnly date = DateOnly.FromDateTime(DateTime.UtcNow);
 

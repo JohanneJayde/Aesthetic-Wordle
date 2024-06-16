@@ -4,12 +4,12 @@ using Wordle.Api.Models;
 
 namespace Wordle.Api.Services;
 
-public class WordOfTheDayService(WordleDbContext Db)
+public class WordOfTheDayService(AppDbContext Db)
 {
     private readonly List<string> words = WordList();
     private static object _lock = new();
 
-    public WordleDbContext Db { get; set; } = Db;
+    public AppDbContext Db { get; set; } = Db;
 
     public async Task<Word> GetRandomWord(string containsText = "")
     {

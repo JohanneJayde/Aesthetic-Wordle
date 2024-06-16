@@ -5,7 +5,7 @@ using Wordle.Api.Models;
 namespace Wordle.Api.Identity;
 public static class IdentitySeed
 {
-    public static async Task SeedAsync(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, WordleDbContext db)
+    public static async Task SeedAsync(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, AppDbContext db)
     {
         // Seed Roles
         await SeedRolesAsync(roleManager);

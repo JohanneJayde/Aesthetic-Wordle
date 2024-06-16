@@ -4,7 +4,7 @@ using Wordle.Api.Services;
 namespace Wordle.Api;
 public static class Seeder
 {
-    public static async Task Seed(WordleDbContext db)
+    public static async Task Seed(AppDbContext db)
     {
         if (!db.Words.Any())
         {
