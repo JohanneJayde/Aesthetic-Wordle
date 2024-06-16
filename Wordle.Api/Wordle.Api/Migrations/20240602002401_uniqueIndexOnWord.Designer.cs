@@ -11,7 +11,7 @@ using Wordle.Api.Models;
 
 namespace Wordle.Api.Migrations
 {
-    [DbContext(typeof(WordleDbContext))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20240602002401_uniqueIndexOnWord")]
     partial class uniqueIndexOnWord
     {

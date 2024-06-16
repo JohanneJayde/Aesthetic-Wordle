@@ -3,9 +3,9 @@ using Wordle.Api.Dtos;
 using Wordle.Api.Models;
 
 namespace Wordle.Api.Services;
-public class StatisticsService(WordleDbContext db)
+public class StatisticsService(AppDbContext db)
 {
-    public WordleDbContext Db { get; set; } = db;
+    public AppDbContext Db { get; set; } = db;
 
     public async Task<GameStatsDto> GetAllGames()
     {

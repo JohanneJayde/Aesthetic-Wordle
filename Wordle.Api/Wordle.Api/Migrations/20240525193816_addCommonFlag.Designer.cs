@@ -11,7 +11,7 @@ using Wordle.Api.Models;
 
 namespace Wordle.Api.Migrations
 {
-    [DbContext(typeof(WordleDbContext))]
+    [DbContext(typeof(AppDbContext))]
     [Migration("20240525193816_addCommonFlag")]
     partial class addCommonFlag
     {

@@ -14,11 +14,11 @@ namespace Wordle.Api.Controllers;
 [ApiController]
 public class TokenController : ControllerBase
 {
-    public WordleDbContext _context;
+    public AppDbContext _context;
     public UserManager<AppUser> _userManager;
     public JwtConfiguration _jwtConfiguration;
     public RoleManager<IdentityRole> _roleManager;
-    public TokenController(WordleDbContext context, UserManager<AppUser> userManager, JwtConfiguration jwtConfiguration, RoleManager<IdentityRole> roleManager)
+    public TokenController(AppDbContext context, UserManager<AppUser> userManager, JwtConfiguration jwtConfiguration, RoleManager<IdentityRole> roleManager)
     {
         _context = context;
         _userManager = userManager;
@@ -99,35 +99,5 @@ public class TokenController : ControllerBase
         return Unauthorized("The username or password is incorrect"); // When do we give info back to the user? Pros/Cons?
     }
 
-    [HttpPost("Register")]
-    public async Task<IActionResult> Register([FromBody] AccountRegistrationDto accountRegistrationInfo)
-    {
-
-        var user = _userManager.FindByEmailAsync(accountRegistrationInfo.Email);
-
-        if(user is not null)
-        {
-            return BadRequest("Email has already been registered. Please use sign in!");
-        }
-
-
-        AppUser appUser = new AppUser()
-        {
-            UserName = accountRegistrationInfo.Username,
-            Email = accountRegistrationInfo.Email,
-        };
-
-        var result = await _userManager.CreateAsync(appUser, accountRegistrationInfo.Password);
-
-        if(result.Succeeded)
-        {
-            return Ok("Okay");
-        }
-        else
-        {
-            return BadRequest("Not signed up");
-        }
-
-    }
 }
 

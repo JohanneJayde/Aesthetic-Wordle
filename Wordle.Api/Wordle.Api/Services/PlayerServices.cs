@@ -4,10 +4,10 @@ using Wordle.Api.Models;
 
 namespace Wordle.Api.Services;
 
-public class PlayerServices(WordleDbContext Db)
+public class PlayerServices(AppDbContext Db)
 {
     private static object _lock = new();
-    public WordleDbContext Db { get; set; } = Db;
+    public AppDbContext Db { get; set; } = Db;
 
 
     public async Task SavePlayer(Score score)

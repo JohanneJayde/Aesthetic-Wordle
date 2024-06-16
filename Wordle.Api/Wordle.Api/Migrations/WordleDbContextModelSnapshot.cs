@@ -10,8 +10,8 @@ using Wordle.Api.Models;
 
 namespace Wordle.Api.Migrations
 {
-    [DbContext(typeof(WordleDbContext))]
-    partial class WordleDbContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(AppDbContext))]
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {

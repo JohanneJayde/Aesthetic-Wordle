@@ -8,7 +8,7 @@ namespace Wordle.Api.Tests;
 public class DatabaseTestBase
 {
     private SqliteConnection SqliteConnection { get; set; } = null!;
-    protected DbContextOptions<WordleDbContext> Options { get; private set; } = null!;
+    protected DbContextOptions<AppDbContext> Options { get; private set; } = null!;
 
     private static ILoggerFactory GetLoggerFactory()
     {
@@ -27,13 +27,13 @@ public class DatabaseTestBase
         SqliteConnection = new SqliteConnection("DataSource=:memory:");
         SqliteConnection.Open();
 
-        Options = new DbContextOptionsBuilder<WordleDbContext>()
+        Options = new DbContextOptionsBuilder<AppDbContext>()
             .UseSqlite(SqliteConnection)
             .UseLoggerFactory(GetLoggerFactory())
             .EnableSensitiveDataLogging()
             .Options;
 
-        using var context = new WordleDbContext(Options);
+        using var context = new AppDbContext(Options);
         context.Database.EnsureCreated();
     }
 
