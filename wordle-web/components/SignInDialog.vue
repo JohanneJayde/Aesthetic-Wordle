@@ -97,7 +97,9 @@
                 label="Password"
                 :type="showPassword ? 'text' : 'password'"
                 :append-inner-icon="
-                  showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'
+                  showPasswordConfirm
+                    ? 'mdi-eye-off-outline'
+                    : 'mdi-eye-outline'
                 "
                 :rules="confirmPasswordRule"
                 variant="outlined"

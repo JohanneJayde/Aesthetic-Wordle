@@ -19,7 +19,6 @@
           @update:model-value="updateVolume($event)"
         >
           <template v-slot:append>
-            <v-col cols=""></v-col>
             <v-sheet
               hide-details
               single-line
