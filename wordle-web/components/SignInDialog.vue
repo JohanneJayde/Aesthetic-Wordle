@@ -2,7 +2,9 @@
   <v-dialog v-model="modelValue" width="500" @update:model-value="close">
     <v-card>
       <v-sheet color="primary mb-3">
-        <v-card-title class="text-wrap">Sign in</v-card-title>
+        <v-card-title class="text-wrap">{{
+          currentPage === 0 ? "Sign in" : "Register"
+        }}</v-card-title>
       </v-sheet>
       <v-alert
         v-if="errorMessage"
@@ -17,10 +19,10 @@
         <v-tab>Sign In</v-tab>
         <v-tab>Register</v-tab>
       </v-tabs>
-      <v-tabs-window v-model="currentPage">
+      <v-tabs-window v-model="currentPage" class="mt-3">
         <v-tabs-window-item>
-          <v-card-text>
-            <v-form v-model="validateSignIN" @submit.prevent>
+          <v-form v-model="validateSignIN" @submit.prevent>
+            <v-col>
               <v-text-field
                 v-model="email"
                 :rules="emailRule"
@@ -29,7 +31,8 @@
                 type="email"
                 variant="outlined"
               />
-              <v-col />
+            </v-col>
+            <v-col>
               <v-text-field
                 v-model="password"
                 @keyup.stop
@@ -41,8 +44,8 @@
                 variant="outlined"
                 @click:append-inner="showPassword = !showPassword"
               />
-            </v-form>
-          </v-card-text>
+            </v-col>
+          </v-form>
           <v-card-actions>
             <v-spacer />
             <v-btn color="primary" variant="tonal" @click="close">
@@ -54,8 +57,8 @@
           </v-card-actions>
         </v-tabs-window-item>
         <v-tabs-window-item>
-          <v-card-text>
-            <v-form v-model="validateRegister" @submit.prevent>
+          <v-form v-model="validateRegister" @submit.prevent>
+            <v-col>
               <v-text-field
                 v-model="email"
                 @keyup.stop
@@ -64,12 +67,16 @@
                 type="email"
                 variant="outlined"
               />
+            </v-col>
+            <v-col>
               <v-text-field
                 v-model="userName"
                 @keyup.stop
                 label="Username"
                 variant="outlined"
               />
+            </v-col>
+            <v-col>
               <v-text-field
                 v-model="password"
                 @keyup.stop
@@ -82,8 +89,23 @@
                 variant="outlined"
                 @click:append-inner="showPassword = !showPassword"
               />
-            </v-form>
-          </v-card-text>
+            </v-col>
+            <v-col>
+              <v-text-field
+                v-model="passwordConfirm"
+                @keyup.stop
+                label="Password"
+                :type="showPassword ? 'text' : 'password'"
+                :append-inner-icon="
+                  showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'
+                "
+                :rules="confirmPasswordRule"
+                variant="outlined"
+                @click:append-inner="showPasswordConfirm = !showPasswordConfirm"
+              />
+            </v-col>
+          </v-form>
+
           <v-card-actions>
             <v-spacer />
             <v-btn color="primary" variant="tonal" @click="close">
@@ -116,6 +138,8 @@ const modelValue = defineModel<boolean>({ default: false });
 const showPassword = ref(false);
 const userName = ref("");
 const password = ref("");
+const showPasswordConfirm = ref(false);
+const passwordConfirm = ref("");
 const email = ref("");
 const errorMessage = ref("");
 const currentPage = ref();
@@ -123,17 +147,29 @@ const validateSignIN = ref(false);
 const validateRegister = ref(false);
 
 const emailRule = [
-  (v: string) => !!v || "E-mail is required",
-  (v: string) => /.+@.+\..+/.test(v) || "E-mail must be valid",
+  (emailValue: string) => !!emailValue || "E-mail is required",
+  (emailValue: string) =>
+    /.+@.+\..+/.test(emailValue) || "E-mail must be valid",
 ];
 
 const passwordRule = [
-  (v: string) => !!v || "Password is required",
-  (v: string) => v.length >= 8 || "Password must be at least 8 characters",
-  (v: string) => /[A-Z]/.test(v) || "Password must contain an uppercase letter",
-  (v: string) => /[a-z]/.test(v) || "Password must contain a lowercase letter",
-  (v: string) => /\d/.test(v) || "Password must contain a number",
-  (v: string) => /\W/.test(v) || "Password must contain a special character",
+  (passwordValue: string) => !!passwordValue || "Password is required",
+  (passwordValue: string) =>
+    passwordValue.length >= 8 || "Password must be at least 8 characters",
+  (passwordValue: string) =>
+    /[A-Z]/.test(passwordValue) || "Password must contain an uppercase letter",
+  (passwordValue: string) =>
+    /[a-z]/.test(passwordValue) || "Password must contain a lowercase letter",
+  (passwordValue: string) =>
+    /\d/.test(passwordValue) || "Password must contain a number",
+  (passwordValue: string) =>
+    /\W/.test(passwordValue) || "Password must contain a special character",
+];
+
+const confirmPasswordRule = [
+  (passwordValue: string) => !!passwordValue || "Password is required",
+  (passwordValue: string) =>
+    passwordValue === password.value || "Passwords do not match",
 ];
 
 watch(
@@ -143,6 +179,7 @@ watch(
     email.value = "";
     password.value = "";
     userName.value = "";
+    passwordConfirm.value = "";
   }
 );
 
@@ -186,6 +223,8 @@ function close() {
   userName.value = "";
   password.value = "";
   email.value = "";
+  passwordConfirm.value = "";
+  currentPage.value = 0;
   modelValue.value = false;
 }
 </script>
