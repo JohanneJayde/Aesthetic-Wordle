@@ -72,6 +72,7 @@
               <v-text-field
                 v-model="userName"
                 @keyup.stop
+                :rules="[() => !!userName || 'Username is required']"
                 label="Username"
                 variant="outlined"
               />
