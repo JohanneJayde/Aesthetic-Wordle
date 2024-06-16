@@ -9,7 +9,7 @@
         type="error"
         title-date-format="Function"
         rounded
-        class="w-75 mx-auto"
+        class="mx-3"
       >
         {{ errorMessage }}
       </v-alert>
@@ -39,7 +39,13 @@
       <v-card-actions>
         <v-spacer />
         <v-btn color="primary" variant="tonal" @click="close"> Cancel </v-btn>
-        <v-btn color="primary" variant="flat" @click="signIn"> Sign In </v-btn>
+        <v-btn
+          color="primary"
+          variant="flat"
+          @click="currentPage === 0 ? signIn() : register()"
+        >
+          {{ currentPage === 0 ? "Sign In" : "Register" }}
+        </v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -62,7 +68,6 @@ const errorMessage = ref("");
 const currentPage = ref(0);
 
 function signIn() {
-  errorMessage.value = "";
   axios
     .post("/Token/GetToken", {
       username: userName.value,
@@ -70,6 +75,23 @@ function signIn() {
     })
     .then((response) => {
       tokenService.setToken(response.data.token);
+      modelValue.value = false;
+      router.push("/");
+    })
+    .catch((error) => {
+      errorMessage.value = error.response.data;
+    });
+}
+
+function register() {
+  axios
+    .post("/Account/Register/", {
+      username: userName.value,
+      password: password.value,
+      email: email.value,
+    })
+    .then(() => {
+      signIn();
       modelValue.value = false;
       router.push("/");
     })
