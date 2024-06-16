@@ -103,6 +103,14 @@ public class TokenController : ControllerBase
     public async Task<IActionResult> Register([FromBody] AccountRegistrationDto accountRegistrationInfo)
     {
 
+        var user = _userManager.FindByEmailAsync(accountRegistrationInfo.Email);
+
+        if(user is not null)
+        {
+            return BadRequest("Email has already been registered. Please use sign in!");
+        }
+
+
         AppUser appUser = new AppUser()
         {
             UserName = accountRegistrationInfo.Username,
