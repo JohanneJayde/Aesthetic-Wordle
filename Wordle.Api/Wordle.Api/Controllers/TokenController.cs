@@ -29,7 +29,7 @@ public class TokenController : ControllerBase
     [HttpPost("GetToken")]
     public async Task<IActionResult> GetToken([FromBody] UserCredentialsDto userCredentials)
     {
-        if (string.IsNullOrEmpty(userCredentials.Username))
+        if (string.IsNullOrEmpty(userCredentials.Email))
         {
             return BadRequest("Username is required");
         }
@@ -38,11 +38,10 @@ public class TokenController : ControllerBase
             return BadRequest("Password is required");
         }
 
-        var user = _context.Users.FirstOrDefault(u => u.UserName == userCredentials.Username);
+        var user = await _userManager.FindByEmailAsync(userCredentials.Email);
 
         if (user is null) { return Unauthorized("The user account was not found"); }
 
-        // Verify the user's password - Microsoft will do this for us. 
         bool results = await _userManager.CheckPasswordAsync(user, userCredentials.Password);
         if (results)
         {
@@ -57,7 +56,7 @@ public class TokenController : ControllerBase
                 new(JwtRegisteredClaimNames.Sub, user.UserName!),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new("userId", user.Id.ToString()),
-                new("userName", user.UserName!.ToString().Substring(0,user.UserName.ToString().IndexOf("@"))), // Use the email as the username, but get rid of the email domain
+                new("userName", user.UserName!.ToString()),
                 new(Claims.BirthDate,user.Birthday.ToString())
             };
 
