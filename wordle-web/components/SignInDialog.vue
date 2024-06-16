@@ -17,36 +17,89 @@
         <v-tab>Sign In</v-tab>
         <v-tab>Register</v-tab>
       </v-tabs>
-      <v-card-text>
-        <v-text-field
-          v-model="email"
-          @keyup.stop
-          label="Email"
-          v-if="currentPage == 1"
-        />
-        <v-text-field v-model="userName" @keyup.stop label="Username" />
-        <v-text-field
-          v-model="password"
-          @keyup.stop
-          label="Password"
-          :type="showPassword ? 'text' : 'password'"
-          :append-inner-icon="
-            showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'
-          "
-          @click:append-inner="showPassword = !showPassword"
-        />
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer />
-        <v-btn color="primary" variant="tonal" @click="close"> Cancel </v-btn>
-        <v-btn
-          color="primary"
-          variant="flat"
-          @click="currentPage === 0 ? signIn() : register()"
-        >
-          {{ currentPage === 0 ? "Sign In" : "Register" }}
-        </v-btn>
-      </v-card-actions>
+      <v-tabs-window v-model="currentPage">
+        <v-tabs-window-item>
+          <v-card-text>
+            <v-form v-model="validateSignIN" @submit.prevent>
+              <v-text-field
+                v-model="email"
+                :rules="emailRule"
+                @keyup.stop
+                label="Email"
+                type="email"
+                variant="outlined"
+              />
+              <v-col />
+              <v-text-field
+                v-model="password"
+                @keyup.stop
+                label="Password"
+                :type="showPassword ? 'text' : 'password'"
+                :append-inner-icon="
+                  showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'
+                "
+                variant="outlined"
+                @click:append-inner="showPassword = !showPassword"
+              />
+            </v-form>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn color="primary" variant="tonal" @click="close">
+              Cancel
+            </v-btn>
+            <v-btn color="primary" variant="flat" type="submit" @click="signIn">
+              Sign In
+            </v-btn>
+          </v-card-actions>
+        </v-tabs-window-item>
+        <v-tabs-window-item>
+          <v-card-text>
+            <v-form v-model="validateRegister" @submit.prevent>
+              <v-text-field
+                v-model="email"
+                @keyup.stop
+                label="Email"
+                :rules="emailRule"
+                type="email"
+                variant="outlined"
+              />
+              <v-text-field
+                v-model="userName"
+                @keyup.stop
+                label="Username"
+                variant="outlined"
+              />
+              <v-text-field
+                v-model="password"
+                @keyup.stop
+                label="Password"
+                :type="showPassword ? 'text' : 'password'"
+                :append-inner-icon="
+                  showPassword ? 'mdi-eye-off-outline' : 'mdi-eye-outline'
+                "
+                :rules="passwordRule"
+                variant="outlined"
+                @click:append-inner="showPassword = !showPassword"
+              />
+            </v-form>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer />
+            <v-btn color="primary" variant="tonal" @click="close">
+              Cancel
+            </v-btn>
+            <v-btn
+              color="primary"
+              variant="flat"
+              type="submit"
+              @click="register"
+            >
+              Register
+            </v-btn>
+          </v-card-actions>
+        </v-tabs-window-item>
+      </v-tabs-window>
     </v-card>
   </v-dialog>
 </template>
@@ -65,12 +118,41 @@ const userName = ref("");
 const password = ref("");
 const email = ref("");
 const errorMessage = ref("");
-const currentPage = ref(0);
+const currentPage = ref();
+const validateSignIN = ref(false);
+const validateRegister = ref(false);
+
+const emailRule = [
+  (v: string) => !!v || "E-mail is required",
+  (v: string) => /.+@.+\..+/.test(v) || "E-mail must be valid",
+];
+
+const passwordRule = [
+  (v: string) => !!v || "Password is required",
+  (v: string) => v.length >= 8 || "Password must be at least 8 characters",
+  (v: string) => /[A-Z]/.test(v) || "Password must contain an uppercase letter",
+  (v: string) => /[a-z]/.test(v) || "Password must contain a lowercase letter",
+  (v: string) => /\d/.test(v) || "Password must contain a number",
+  (v: string) => /\W/.test(v) || "Password must contain a special character",
+];
+
+watch(
+  () => currentPage.value,
+  () => {
+    errorMessage.value = "";
+    email.value = "";
+    password.value = "";
+    userName.value = "";
+  }
+);
 
 function signIn() {
+  errorMessage.value = "";
+  if (!validateSignIN.value) return;
+
   axios
     .post("/Token/GetToken", {
-      username: userName.value,
+      email: email.value,
       password: password.value,
     })
     .then((response) => {
@@ -84,6 +166,8 @@ function signIn() {
 }
 
 function register() {
+  if (!validateRegister.value) return;
+
   axios
     .post("/Account/Register/", {
       username: userName.value,
@@ -92,8 +176,6 @@ function register() {
     })
     .then(() => {
       signIn();
-      modelValue.value = false;
-      router.push("/");
     })
     .catch((error) => {
       errorMessage.value = error.response.data;
