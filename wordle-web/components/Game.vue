@@ -211,13 +211,13 @@ const showWordsList = ref(false);
 const isGameOver = ref(false);
 const playerName = ref("");
 const showNameDialog = ref(false);
-const validWordsNum = ref(0);
 const itemSelect = ref("");
 const date = route.query.date?.toString();
 const volumne = ref(0.5);
 const wordsList = ref<string[]>([]);
 
 const game = reactive(new Game());
+const validWordsNum = computed(() => game.filterValidWords().length);
 provide("GAME", game);
 const stopwatch = ref(new Stopwatch());
 
