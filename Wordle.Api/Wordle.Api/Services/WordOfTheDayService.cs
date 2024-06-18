@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Wordle.Api.Dtos;
 using Wordle.Api.Models;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Wordle.Api.Services;
 
@@ -62,7 +63,7 @@ public class WordOfTheDayService(AppDbContext Db)
     public async Task<WordResultDto> GetWordsList(string query, int page, int pageSize)
     {
 
-        var queryResult = 
+        var queryResult =
             Db.Words.
             Select(word => new WordDto() { Word = word.Text, IsCommonWord = word.IsCommonWord })
             .Where(wordDto => wordDto.Word.StartsWith(query))
@@ -75,7 +76,20 @@ public class WordOfTheDayService(AppDbContext Db)
 
 
 
-        return new WordResultDto() { Count= count, Items = results };
+        return new WordResultDto() { Count = count, Items = results };
+    }
+
+    public async Task<WordResultDto> GetAllWords()
+    {
+        var queryResult =
+            Db.Words.
+            Select(word => new WordDto() { Word = word.Text, IsCommonWord = word.IsCommonWord })
+            .OrderBy(wordDto => wordDto.Word);
+
+        var count = await queryResult.CountAsync();
+
+    return new WordResultDto() { Count = count, Items = await queryResult.ToListAsync() };
+
     }
 
     #region WordList

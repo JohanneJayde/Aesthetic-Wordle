@@ -42,6 +42,12 @@ public class WordController(WordOfTheDayService wordOfTheDayService, WordEditorS
         return await wordOfTheDayService.GetWordsList(query, page, pageSize);
     }
 
+    [HttpGet("FullWordsList/")]
+    public async Task<WordResultDto> GetFullWordsList()
+    {
+        return await wordOfTheDayService.GetAllWords();
+    }
+
     [HttpPost("AddWord")]
     [Authorize(Policy = Policies.AddOrDeleteWord)]
     public async Task AddWord(WordDto word)
