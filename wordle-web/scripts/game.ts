@@ -12,6 +12,7 @@ export class Game {
   public isBusy: boolean = false;
   public stats: GameStats | null = null;
   public playerNmae: string = "";
+  public wordsList: string[] = [];
 
   private _secretWord: string = "";
   private set secretWord(value: string) {
@@ -54,6 +55,10 @@ export class Game {
     // Start the game
     this.gameState = GameState.Playing;
     this.isBusy = false;
+  }
+
+  public setWordsList(words: string[]) {
+    this.wordsList = words;
   }
 
   public get guess() {
@@ -104,7 +109,7 @@ export class Game {
   public async submitGuess(name: string, currentTime: number = 0) {
     if (this.gameState !== GameState.Playing) return;
     if (!this.guess.isFilled) return;
-    if (!this.guess.isValidWord()) {
+    if (!this.isValidWord(this.guess)) {
       this.guess.clear();
       return;
     }
@@ -163,6 +168,10 @@ export class Game {
       console.error("Error fetching random word:", error);
       return "ERROR"; // Probably best to print the error on screen, but this is kind of funny. :)
     }
+  }
+
+  public isValidWord(word: Word): boolean {
+    return this.wordsList.includes(word.word.toLowerCase());
   }
 }
 
