@@ -157,11 +157,7 @@
         v-model:show="showNameDialog"
         v-model:name="playerName"
       />
-      <WordList
-        @keyup.stop
-        v-model="showWordsList"
-        @validWordsUpdate="captureValidWords"
-      />
+      <WordList @keyup.stop v-model="showWordsList" :wordsList="wordsList" />
     </v-sheet>
   </v-container>
 </template>
@@ -224,10 +220,6 @@ const wordsList = ref<string[]>([]);
 const game = reactive(new Game());
 provide("GAME", game);
 const stopwatch = ref(new Stopwatch());
-
-const captureValidWords = (num: number) => {
-  validWordsNum.value = num;
-};
 
 const option = ref<string | null>();
 
@@ -332,10 +324,14 @@ onMounted(async () => {
   playerName.value = showNameDialog.value ? "Guest" : defaultName;
   stopwatch.value.start();
 
-  const wordListDto = await Axios.get("Word/FullWordsList");
-  const wordListData: WordDto[] = wordListDto.data.items;
-  wordsList.value = wordListData.map((word) => word.word.toLowerCase());
-  game.setWordsList(wordsList.value);
+  Axios.get("Word/FullWordsList")
+    .then((res) => res.data)
+    .then((data) => {
+      wordsList.value = data.items.map((word: WordDto) =>
+        word.word.toLowerCase()
+      );
+      game.setWordsList(wordsList.value);
+    });
   if (props.isDaily) {
     option.value = date;
   } else {

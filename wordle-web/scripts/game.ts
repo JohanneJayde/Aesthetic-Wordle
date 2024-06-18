@@ -173,6 +173,42 @@ export class Game {
   public isValidWord(word: Word): boolean {
     return this.wordsList.includes(word.word.toLowerCase());
   }
+
+  public filterValidWords(): string[] {
+    return this.wordsList.filter((word) => {
+      for (let i = 0; i < this.guessedLetters.length; i++) {
+        const letterObj = this.guessedLetters[i];
+        const letterChar = letterObj.char.toLowerCase();
+
+        const indexOfLetterInWord = word.indexOf(letterChar);
+        const indexOfLetterInSecretWord = this.secretWord
+          .toLowerCase()
+          .indexOf(letterChar);
+        if (
+          word.includes(letterChar) &&
+          this.guessedLetters[i].state === LetterState.Wrong
+        ) {
+          return false;
+        }
+        if (
+          !word.includes(letterChar) &&
+          (letterObj.state === LetterState.Correct ||
+            letterObj.state === LetterState.Misplaced)
+        ) {
+          return false;
+        }
+        if (
+          word.includes(letterChar) &&
+          (letterObj.state === LetterState.Correct ||
+            letterObj.state === LetterState.Misplaced) &&
+          indexOfLetterInWord !== indexOfLetterInSecretWord
+        ) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }
 }
 
 export enum GameState {
