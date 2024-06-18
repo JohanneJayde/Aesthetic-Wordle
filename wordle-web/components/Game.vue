@@ -187,6 +187,7 @@ import {
   playLoseSound,
   playWinSound,
 } from "../scripts/soundUtils";
+import type { WordDto } from "~/Models/WordDto";
 
 const truncate = (text: string, length: number, clamp: string) => {
   clamp = clamp || "...";
@@ -218,6 +219,7 @@ const validWordsNum = ref(0);
 const itemSelect = ref("");
 const date = route.query.date?.toString();
 const volumne = ref(0.5);
+const wordsList = ref<string[]>([]);
 
 const game = reactive(new Game());
 provide("GAME", game);
@@ -330,6 +332,10 @@ onMounted(async () => {
   playerName.value = showNameDialog.value ? "Guest" : defaultName;
   stopwatch.value.start();
 
+  const wordListDto = await Axios.get("Word/FullWordsList");
+  const wordListData: WordDto[] = wordListDto.data.items;
+  wordsList.value = wordListData.map((word) => word.word.toLowerCase());
+  game.setWordsList(wordsList.value);
   if (props.isDaily) {
     option.value = date;
   } else {
