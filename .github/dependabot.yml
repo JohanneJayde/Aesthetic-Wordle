@@ -1,6 +1,6 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
-    directory: "wordle.web"
+    directory: "wordle-web"
     schedule:
       interval: "monthly"
