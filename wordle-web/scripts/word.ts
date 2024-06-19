@@ -1,5 +1,4 @@
 import { Letter, LetterState } from "./letter";
-import { WordList } from "./wordList";
 
 export class Word {
   public letters: Letter[];
@@ -48,7 +47,7 @@ export class Word {
       if (letter.char === this.letters[i].char) {
         this.letters[i].state = LetterState.Correct;
         letter.state = LetterState.Correct;
-      }else{
+      } else {
         isMatch = false;
       }
     }
@@ -75,10 +74,6 @@ export class Word {
 
   public get word(): string {
     return this.letters.map((x) => x.char).join("");
-  }
-
-  public isValidWord() {
-    return WordList.includes(this.word.toLowerCase());
   }
 
   public clear() {
