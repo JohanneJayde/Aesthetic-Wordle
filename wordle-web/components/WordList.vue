@@ -2,26 +2,30 @@
   <v-bottom-sheet v-model="modelValue">
     <v-card>
       <v-card-item>
-        <v-virtual-scroll
+        <v-data-table
           :items="game?.filterValidWords() || []"
-          :item-height="50"
-          height="300"
+          hide-default-header
         >
-          <template v-slot="{ item }">
-            <v-row no-gutters>
-              <v-col>
-                <v-btn
-                  :disabled="game?.gameState !== GameState.Playing"
-                  class="w-100"
-                  height="50"
-                  @click="addGuess(item)"
-                  flat
-                  >{{ item }}</v-btn
-                >
-              </v-col>
-            </v-row>
+          <template #top>
+            <v-autocomplete
+              :items="game?.filterValidWords()"
+              variant="outlined"
+              v-model="searchWord"
+              :disabled="game?.gameState !== GameState.Playing"
+              @update:model-value="addGuess(searchWord)"
+            />
           </template>
-        </v-virtual-scroll>
+          <template v-slot:item="{ item }">
+            <v-btn
+              :disabled="game?.gameState !== GameState.Playing"
+              class="w-100"
+              height="50"
+              @click="addGuess(item)"
+              flat
+              >{{ item }}</v-btn
+            >
+          </template>
+        </v-data-table>
       </v-card-item>
 
       <v-card-actions>
@@ -36,9 +40,13 @@ import type { Game } from "~/scripts/game";
 import { GameState } from "~/scripts/game";
 
 const modelValue = defineModel<boolean>({ default: false });
+
+const searchWord = ref("");
+
 const game: Game | undefined = inject("GAME");
 
 function addGuess(word: string) {
+  searchWord.value = "";
   game?.guess.clear();
   for (let i = 0; i < word.length; i++) {
     game?.addLetter(word[i].toUpperCase());

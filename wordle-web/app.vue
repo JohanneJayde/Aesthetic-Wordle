@@ -65,9 +65,7 @@
         </v-list-item>
       </v-list>
     </v-navigation-drawer>
-    <v-main>
-      <NuxtPage />
-    </v-main>
+    <v-main> <NuxtPage /> </v-main>
     <SettingsDialogue v-model="showSettingsDialog" />
     <SignInDialog v-model="showSignInDialog" />
     <ConfirmDialog
