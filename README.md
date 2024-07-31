@@ -7,3 +7,5 @@
 [![Build and deploy ASP.Net Core app to Azure Web App - AestheticWordle](https://github.com/JohanneJayde/Aesthetic-Wordle/actions/workflows/azure-web-app_aestheticwordle.yml/badge.svg)](https://github.com/JohanneJayde/Aesthetic-Wordle/actions/workflows/azure-web-app_aestheticwordle.yml)
 
 This is our ASP.NET Web development project. It utlizes, Vue.js, Nuxt.js, ASP.NET MVC, Azure Static Web App, Azure SQL Server, Azure App Services, and Github actions for CI/CD
+
+NOTICE: AS OF 7/31/2024, the Azure site is down. My student subscription has ended so I have to migrate to new one and re create resources :)
