@@ -3,9 +3,14 @@ using System.Security.Claims;
 using Wordle.Api.Models;
 
 namespace Wordle.Api.Identity;
+
 public static class IdentitySeed
 {
-    public static async Task SeedAsync(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, AppDbContext db)
+    public static async Task SeedAsync(
+        UserManager<AppUser> userManager,
+        RoleManager<IdentityRole> roleManager,
+        AppDbContext db
+    )
     {
         // Seed Roles
         await SeedRolesAsync(roleManager);
@@ -31,15 +36,15 @@ public static class IdentitySeed
     private static async Task SeedAdminUserAsync(UserManager<AppUser> userManager)
     {
         // Seed Admin User
-        if (await userManager.FindByEmailAsync("Admin@intellitect.com") == null)
+        if (await userManager.FindByEmailAsync("Admin@AestheticWordle.com") == null)
         {
-
-            AppUser user = new AppUser
-            {
-                UserName = "Admin@intellitect.com",
-                Email = "Admin@intellitect.com",
-                Birthday = new DateTime(2007, 5, 6)
-            };
+            AppUser user =
+                new()
+                {
+                    UserName = "Admin@AestheticWordle.com",
+                    Email = "Admin@AestheticWordle.com",
+                    Birthday = new DateTime(2007, 5, 6)
+                };
 
             IdentityResult result = userManager.CreateAsync(user, "P@ssw0rd123").Result;
 
@@ -49,14 +54,15 @@ public static class IdentitySeed
             }
         }
 
-        if (await userManager.FindByEmailAsync("Awesome@intellitect.com") == null)
+        if (await userManager.FindByEmailAsync("Awesome@AestheticWordle.com") == null)
         {
-            AppUser user = new AppUser
-            {
-                UserName = "Awesome@intellitect.com",
-                Email = "Awesome@intellitect.com",
-                Birthday = new DateTime(2000, 10, 31)
-            };
+            AppUser user =
+                new()
+                {
+                    UserName = "Awesome@AestheticWordle.com",
+                    Email = "Awesome@AestheticWordle.com",
+                    Birthday = new DateTime(2000, 10, 31)
+                };
 
             IdentityResult result = userManager.CreateAsync(user, "P@ssw0rd123").Result;
             var masterOfTheUniverseClaim = new Claim(Claims.MasterOfTheUniverse, "true");
