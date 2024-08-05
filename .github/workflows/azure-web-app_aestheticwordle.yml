@@ -63,7 +63,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
         with:
-          app-name: "AestheticWordle"
+          app-name: "AestheticWordleAPI"
           slot-name: "Production"
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F5DCB5F2DF054728BAC86A9D97DFBC12  }}
           package: .
