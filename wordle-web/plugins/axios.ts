@@ -8,7 +8,7 @@ export default defineNuxtPlugin(() => {
     ) {
       Axios.defaults.baseURL = "https://localhost:7266/";
     } else {
-      Axios.defaults.baseURL = "https://aestheticwordle.azurewebsites.net/";
+      Axios.defaults.baseURL = "https://aestheticwordleapi.azurewebsites.net/";
     }
   }
   Axios.defaults.headers.common["Content-Type"] = "application/json";
