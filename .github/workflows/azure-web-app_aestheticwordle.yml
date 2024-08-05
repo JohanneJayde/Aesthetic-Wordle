@@ -65,5 +65,5 @@ jobs:
         with:
           app-name: "AestheticWordle"
           slot-name: "Production"
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_C0A8245C701E459288158E1DA29338AC  }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_F5DCB5F2DF054728BAC86A9D97DFBC12  }}
           package: .
