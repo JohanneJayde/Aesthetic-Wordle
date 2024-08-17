@@ -61,7 +61,6 @@ builder.Services.AddSwaggerGen(config =>
 );
 
 builder.Services.AddScoped<WordOfTheDayService>();
-builder.Services.AddScoped<PlayerServices>();
 builder.Services.AddScoped<GameService>();
 builder.Services.AddScoped<StatisticsService>();
 builder.Services.AddScoped<WordEditorService>();
