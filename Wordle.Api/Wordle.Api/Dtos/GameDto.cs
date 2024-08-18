@@ -9,6 +9,5 @@ public class GameDto
 
     public required string Word {  get; set; }
 
-    public string Name { get; set; } = null!;
 }
 

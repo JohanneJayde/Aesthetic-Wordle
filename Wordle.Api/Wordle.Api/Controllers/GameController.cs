@@ -9,16 +9,10 @@ namespace Wordle.Api.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-public class GameController : ControllerBase
+public class GameController(GameService gameService, UserManager<AppUser> userManager) : ControllerBase
 {
-    public GameService GameService { get; set; }
-    UserManager<AppUser> UserManager {  get; set; }
-
-    public GameController(GameService gameService, UserManager<AppUser> userMananger)
-    {
-        GameService = gameService;
-        UserManager = userMananger;
-    }
+    public GameService GameService { get; set; } = gameService;
+    UserManager<AppUser> UserManager { get; set; } = userManager;
 
     [HttpPost("Result")]
     public async Task<IActionResult> PostGame(GameDto gameDto)
