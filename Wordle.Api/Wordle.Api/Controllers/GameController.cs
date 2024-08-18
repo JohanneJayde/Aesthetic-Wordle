@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Wordle.Api.Dtos;
 using Wordle.Api.Models;
 using Wordle.Api.Services;
@@ -10,19 +12,35 @@ namespace Wordle.Api.Controllers;
 public class GameController : ControllerBase
 {
     public GameService GameService { get; set; }
+    UserManager<AppUser> UserManager {  get; set; }
 
-    public GameController(GameService gameService)
+    public GameController(GameService gameService, UserManager<AppUser> userMananger)
     {
         GameService = gameService;
+        UserManager = userMananger;
     }
 
     [HttpPost("Result")]
-    public async Task<GameStatsDto> PostGame(GameDto gameDto)
+    public async Task<IActionResult> PostGame(GameDto gameDto)
     {
-        Game game = await GameService.PostGameResult(gameDto);
+        var email = User.FindFirstValue("email");
+
+        if (string.IsNullOrEmpty(email))
+        {
+            return Unauthorized("Cannot save for unauthorized User");
+        }
+
+        AppUser? user = await UserManager.FindByEmailAsync(email);
+
+        if(user is null)
+        {
+            return BadRequest("An error occurred while processing your request.");
+        }
+
+        Game game = await GameService.PostGameResult(user, gameDto);
         var stats = await GameService.GetGameStats(game);
 
-        return stats;
+        return Ok(stats);
     }
 
     [HttpGet("WordOfTheDayStats/{date}")]

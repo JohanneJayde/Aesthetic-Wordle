@@ -18,7 +18,7 @@ public class StatisticsService(AppDbContext db)
             TotalTimesPlayed = games.Count(),
             TotalWins = games.Count(g => g.IsWin),
             AverageSeconds = games.Average(w => w.Seconds),
-            Usernames = [.. games.Select(g => g.Name).Where(name => !string.IsNullOrEmpty(name))]
+            Usernames = [.. games.Select(g => g.AppUser!.UserName).Where(name => !string.IsNullOrEmpty(name))]
 
         };
 

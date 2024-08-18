@@ -7,29 +7,25 @@ public class GameService(AppDbContext db)
 {
     public AppDbContext Db { get; set; } = db;
 
-    public async Task<Game> PostGameResult(GameDto gameDto)
+    public async Task<Game> PostGameResult(AppUser user, GameDto gameDto)
     {
-        // Get todays date
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
-        // Get all the words that match our game word and load their WOTDs
         var word = Db.Words
         .Include(word => word.WordsOfTheDays)
             .Where(word => word.Text == gameDto.Word)
             .First();
 
-        // Create a new game object to save to the DB
         Game game = new()
         {
             Attempts = gameDto.Attempts,
             IsWin = gameDto.IsWin,
-            // Attempt to find the WOTD that best matches todays date
             WordOfTheDay = word.WordsOfTheDays
                 .OrderByDescending(wotd => wotd.Date)
                 .FirstOrDefault(wotd => wotd.Date <= today),
             Word = word,
             Seconds = gameDto.Seconds,
-            Name = gameDto.Name,
+            AppUser = user,
         };
 
         Db.Games.Add(game);
@@ -48,7 +44,7 @@ public class GameService(AppDbContext db)
             TotalTimesPlayed = await gamesForWord.CountAsync(),
             AverageSeconds = await gamesForWord.AverageAsync(g => g.Seconds),
             TotalWins = await gamesForWord.CountAsync(g => g.IsWin),
-            Usernames = [.. gamesForWord.Select(g => g.Name).Where(name => !string.IsNullOrEmpty(name))]
+            Usernames = [.. gamesForWord.Select(g => g.AppUser!.UserName).Where(name => !string.IsNullOrEmpty(name))]
         };
 
         return stats;
@@ -90,7 +86,7 @@ public class GameService(AppDbContext db)
                 TotalTimesPlayed = wordOfTheDayGames.Count(),
                 TotalWins = wordOfTheDayGames.Count(g => g.IsWin),
                 AverageSeconds = wordOfTheDayGames.Average(w => w.Seconds),
-                Usernames = [.. wordOfTheDayGames.Select(g => g.Name).Where(name => !string.IsNullOrEmpty(name))]
+                Usernames = [.. wordOfTheDayGames.Select(g => g.AppUser!.UserName).Where(name => !string.IsNullOrEmpty(name))]
 
             };
 
