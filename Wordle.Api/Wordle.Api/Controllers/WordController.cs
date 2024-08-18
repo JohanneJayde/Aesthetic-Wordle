@@ -43,20 +43,20 @@ public class WordController(WordOfTheDayService wordOfTheDayService, WordEditorS
     }
 
     [HttpGet("FullWordsList/")]
+    [Authorize]
     public async Task<WordResultDto> GetFullWordsList()
     {
         return await wordOfTheDayService.GetAllWords();
     }
 
     [HttpPost("AddWord")]
-    [Authorize(Policy = Policies.AddOrDeleteWord)]
     public async Task AddWord(WordDto word)
     {
         await wordEditorService.AddWord(word);
     }
 
     [HttpDelete("DeleteWord")]
-    [Authorize(Policy = Policies.AddOrDeleteWord)]
+    [Authorize]
     public async Task DeleteWord(string word)
     {
         await wordEditorService.DeleteWord(word);
