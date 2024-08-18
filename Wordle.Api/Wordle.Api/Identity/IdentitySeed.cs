@@ -43,7 +43,6 @@ public static class IdentitySeed
                 {
                     UserName = "Admin@AestheticWordle.com",
                     Email = "Admin@AestheticWordle.com",
-                    Birthday = new DateTime(2007, 5, 6)
                 };
 
             IdentityResult result = userManager.CreateAsync(user, "P@ssw0rd123").Result;
@@ -61,15 +60,12 @@ public static class IdentitySeed
                 {
                     UserName = "Awesome@AestheticWordle.com",
                     Email = "Awesome@AestheticWordle.com",
-                    Birthday = new DateTime(2000, 10, 31)
                 };
 
             IdentityResult result = userManager.CreateAsync(user, "P@ssw0rd123").Result;
-            var masterOfTheUniverseClaim = new Claim(Claims.MasterOfTheUniverse, "true");
 
             if (result.Succeeded)
             {
-                await userManager.AddClaimAsync(user, masterOfTheUniverseClaim);
                 await userManager.AddToRoleAsync(user, Roles.Awesome);
             }
         }

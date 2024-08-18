@@ -93,7 +93,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 //Add Policies
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy(Policies.AddOrDeleteWord, Policies.AddOrDeleteWordPolicy);
 });
 
 

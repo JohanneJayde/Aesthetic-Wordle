@@ -57,7 +57,6 @@ public class TokenController : ControllerBase
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new("userId", user.Id.ToString()),
                 new("userName", user.UserName!.ToString()),
-                new(Claims.BirthDate,user.Birthday.ToString())
             };
 
             // Retrieve all roles associated with the user

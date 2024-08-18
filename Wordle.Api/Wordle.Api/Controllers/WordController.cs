@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using Wordle.Api.Dtos;
 using Wordle.Api.Identity;
 using Wordle.Api.Services;
@@ -50,20 +51,21 @@ public class WordController(WordOfTheDayService wordOfTheDayService, WordEditorS
     }
 
     [HttpPost("AddWord")]
+    [Authorize]
     public async Task AddWord(WordDto word)
     {
         await wordEditorService.AddWord(word);
     }
 
     [HttpDelete("DeleteWord")]
-    [Authorize]
+    [Authorize(Roles = Roles.Admin)]
     public async Task DeleteWord(string word)
     {
         await wordEditorService.DeleteWord(word);
     }
 
     [HttpPost("EditWord")]
-    [Authorize]
+    [Authorize(Roles = Roles.Admin)]
     public async Task EditWord(WordDto word)
     {
         await wordEditorService.UpdateWord(word);
