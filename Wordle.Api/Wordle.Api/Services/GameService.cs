@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Diagnostics.Metrics;
+using System.Text.RegularExpressions;
 using Wordle.Api.Dtos;
 using Wordle.Api.Models;
 
@@ -7,14 +9,9 @@ public class GameService(AppDbContext db)
 {
     public AppDbContext Db { get; set; } = db;
 
-    public async Task<Game> PostGameResult(AppUser user, GameDto gameDto)
+    public async Task<Game> PostGameResult(AppUser user, Word word, GameDto gameDto)
     {
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
-
-        var word = Db.Words
-        .Include(word => word.WordsOfTheDays)
-            .Where(word => word.Text == gameDto.Word)
-            .First();
 
         Game game = new()
         {
@@ -113,11 +110,63 @@ public class GameService(AppDbContext db)
 
         List<GameStatsDto> wordOfTheDayGames = []; ;
 
-        for(int i = 0; i < 10; i++)
+        for (int i = 0; i < 10; i++)
         {
             wordOfTheDayGames.Add(await WordOfDayStats(date.AddDays(-i)));
         }
         return wordOfTheDayGames;
+    }
+
+    public GameStateDto ValidateGuess(string guess, Word word)
+    {
+        var guessedWord = guess.Select(letter => new LetterState()
+        {
+            Letter = letter,
+            State = WordState.Unknown
+
+        }).ToArray();
+
+        var wordToGuess = word.Text;
+
+        Dictionary<char, int> letterCounts = wordToGuess
+            .GroupBy(letter => letter)
+            .ToDictionary(group => group.Key, group => group.Count());
+
+        for (int i = 0; i < guessedWord.Length; i++)
+        {
+            if (guessedWord[i].Letter == wordToGuess[i])
+            {
+                letterCounts[guessedWord[i].Letter]--;
+                guessedWord[i].State = WordState.Correct;
+            }
+        }
+
+        foreach (var letterState in guessedWord)
+        {
+            if (letterState.State == WordState.Unknown)
+            {
+                foreach (char letter in wordToGuess)
+                {
+                    if (letterState.Letter == letter && letterCounts[letter] > 0)
+                    {
+                        letterState.State = WordState.Misplaced;
+                        letterCounts[letter]--;
+                    }
+                }
+                if (letterState.State == WordState.Unknown)
+                {
+                    letterState.State = WordState.Incorrect;
+                }
+            }
+        }
+
+        bool isWin = guessedWord.All(gs => gs.State == WordState.Correct);
+
+        return new GameStateDto()
+        {
+            WordStates = guessedWord.Select(ls => ls.State).ToList(),
+            IsWin = isWin
+        };
     }
 
     public class AllWordStats()
@@ -125,5 +174,11 @@ public class GameService(AppDbContext db)
         public required string Word { get; set; }
 
         public double AverageGuesses { get; set; }
+    }
+
+    public class LetterState()
+    {
+        public char Letter { get; set; }
+        public WordState State { get; set; }
     }
 }

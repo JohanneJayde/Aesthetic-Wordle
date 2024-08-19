@@ -12,7 +12,7 @@ public class WordEditorService(AppDbContext Db)
     {
         Word? word = await Db.Words.FirstOrDefaultAsync(word => word.Text == Word);
 
-        if(word is not null)
+        if (word is not null)
         {
             Db.Words.Remove(word);
             await Db.SaveChangesAsync();
@@ -24,7 +24,7 @@ public class WordEditorService(AppDbContext Db)
     {
         Word? word = await Db.Words.FirstOrDefaultAsync(word => word.Text == wordToEdit.Word);
 
-        if(word is not null)
+        if (word is not null)
         {
             word.IsCommonWord = wordToEdit.IsCommonWord;
 
@@ -34,7 +34,7 @@ public class WordEditorService(AppDbContext Db)
 
     public async Task AddWord(WordDto wordToAdd)
     {
-        if(wordToAdd.Word.Length != 5)
+        if (wordToAdd.Word.Length != 5)
         {
             return;
         }

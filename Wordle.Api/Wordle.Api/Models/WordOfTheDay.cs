@@ -11,7 +11,7 @@ public class WordOfTheDay
     [Required]
     public int WordId { get; set; }
     public Word? Word { get; set; }
-        
+
     public DateOnly Date { get; set; }
 
     public ICollection<Game> Games { get; set; } = [];

@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -9,36 +10,53 @@ namespace Wordle.Api.Controllers;
 
 [Route("[controller]")]
 [ApiController]
-public class GameController(GameService gameService, UserManager<AppUser> userManager) : ControllerBase
+public class GameController(GameService gameService, WordOfTheDayService wordofTheDayService, UserManager<AppUser> userManager) : ControllerBase
 {
     public GameService GameService { get; set; } = gameService;
-    UserManager<AppUser> UserManager { get; set; } = userManager;
+    public WordOfTheDayService WordOfTheDayService { get; set; } = wordofTheDayService;
+    public UserManager<AppUser> UserManager { get; set; } = userManager;
 
     [HttpPost("Result")]
+    [Authorize]
     public async Task<IActionResult> PostGame(GameDto gameDto)
     {
-        var email = User.FindFirstValue("email");
+        Word? word = await WordOfTheDayService.GetWord(gameDto.WordId);
 
-        if (string.IsNullOrEmpty(email))
+        if (word is null)
         {
-            return Unauthorized("Cannot save for unauthorized User");
+            return BadRequest("Word not found");
         }
 
-        AppUser? user = await UserManager.FindByEmailAsync(email);
+        AppUser? user = await UserManager.GetUserAsync(User);
 
-        if(user is null)
+        if (user is null)
         {
             return BadRequest("An error occurred while processing your request.");
         }
 
-        Game game = await GameService.PostGameResult(user, gameDto);
+        Game game = await GameService.PostGameResult(user, word, gameDto);
         var stats = await GameService.GetGameStats(game);
 
         return Ok(stats);
     }
 
+    [HttpPost("Guess")]
+    public async Task<IActionResult> ValidateGuess(string guess, int wordId)
+    {
+        Word? word = await WordOfTheDayService.GetWord(wordId);
+
+        if (word is null)
+        {
+            return BadRequest("Word not found");
+        }
+
+        var state = GameService.ValidateGuess(guess, word);
+
+        return Ok(state);
+    }
+
     [HttpGet("WordOfTheDayStats/{date}")]
-    public async Task<GameStatsDto> GetWordOfTheDayStats (DateTime date)
+    public async Task<GameStatsDto> GetWordOfTheDayStats(DateTime date)
     {
         var stats = await GameService.WordOfDayStats(date);
 

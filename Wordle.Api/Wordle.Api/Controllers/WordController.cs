@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using Wordle.Api.Dtos;
 using Wordle.Api.Identity;
+using Wordle.Api.Models;
 using Wordle.Api.Services;
 
 namespace Wordle.Api.Controllers;
@@ -22,16 +23,16 @@ public class WordController(WordOfTheDayService wordOfTheDayService, WordEditorS
     /// Get the word of the day.
     /// </summary>
     /// <param name="offsetInHours">Timezone offset in hours. Default to PST</param>
-    /// <returns></returns>
+    /// <returns>wordId representing for the word of the day</returns>
     [HttpGet("WordOfTheDay")]
-    public async Task<string> GetWordOfDay(double offsetInHours = -7.0)
+    public async Task<int> GetWordOfDay(double offsetInHours = -7.0)
     {
         DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(offsetInHours));
         return await wordOfTheDayService.GetWordOfTheDay(today);
     }
 
     [HttpGet("WordOfTheDay/{date}")]
-    public async Task<string> GetWordOfDay(DateTime date)
+    public async Task<int> GetWordOfDay(DateTime date)
     {
         DateOnly dateOnly = DateOnly.FromDateTime(date);
         return await wordOfTheDayService.GetWordOfTheDay(dateOnly);

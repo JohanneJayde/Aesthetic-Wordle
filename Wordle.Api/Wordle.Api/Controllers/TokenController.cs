@@ -50,7 +50,7 @@ public class TokenController : ControllerBase
 
             var claims = new List<Claim>
             {
-                new(JwtRegisteredClaimNames.Sub, user.UserName!),
+                new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new("userId", user.Id.ToString()),
                 new("userName", user.UserName!.ToString()),
