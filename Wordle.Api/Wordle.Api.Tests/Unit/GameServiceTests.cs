@@ -48,7 +48,7 @@ public class GameServiceTests : DatabaseTestBase
         var state = GameService.ValidateGuess(guess, word);
 
         Assert.IsNotNull(state);
-        state.WordStates[0].Should().Be(WordState.Incorrect);
+        state.LetterStates[0].Should().Be(LetterState.Incorrect);
         state.IsWin.Should().BeFalse();
     }
 
@@ -67,7 +67,7 @@ public class GameServiceTests : DatabaseTestBase
         var state = GameService.ValidateGuess(guess, word);
 
         Assert.IsNotNull(state);
-        state.WordStates.Should().OnlyContain(state => state == WordState.Correct);
+        state.LetterStates.Should().OnlyContain(state => state == LetterState.Correct);
         state.IsWin.Should().BeTrue();
 
     }
@@ -85,11 +85,11 @@ public class GameServiceTests : DatabaseTestBase
 
         GameStateDto state = GameService.ValidateGuess(guess, word);
 
-        state.WordStates[0].Should().Be(WordState.Incorrect);
-        state.WordStates[1].Should().Be(WordState.Misplaced);
-        state.WordStates[2].Should().Be(WordState.Misplaced);
-        state.WordStates[3].Should().Be(WordState.Misplaced);
-        state.WordStates[4].Should().Be(WordState.Incorrect);
+        state.LetterStates[0].Should().Be(LetterState.Incorrect);
+        state.LetterStates[1].Should().Be(LetterState.Misplaced);
+        state.LetterStates[2].Should().Be(LetterState.Misplaced);
+        state.LetterStates[3].Should().Be(LetterState.Misplaced);
+        state.LetterStates[4].Should().Be(LetterState.Incorrect);
 
         state.IsWin.Should().BeFalse();
 
@@ -108,11 +108,11 @@ public class GameServiceTests : DatabaseTestBase
 
         GameStateDto state = GameService.ValidateGuess(guess, word);
 
-        state.WordStates[0].Should().Be(WordState.Correct);
-        state.WordStates[1].Should().Be(WordState.Incorrect);
-        state.WordStates[2].Should().Be(WordState.Correct);
-        state.WordStates[3].Should().Be(WordState.Incorrect);
-        state.WordStates[4].Should().Be(WordState.Correct);
+        state.LetterStates[0].Should().Be(LetterState.Correct);
+        state.LetterStates[1].Should().Be(LetterState.Incorrect);
+        state.LetterStates[2].Should().Be(LetterState.Correct);
+        state.LetterStates[3].Should().Be(LetterState.Incorrect);
+        state.LetterStates[4].Should().Be(LetterState.Correct);
 
         state.IsWin.Should().BeFalse();
 

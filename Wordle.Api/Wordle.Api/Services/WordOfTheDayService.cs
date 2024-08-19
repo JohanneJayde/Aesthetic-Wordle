@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Wordle.Api.Dtos;
 using Wordle.Api.Models;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace Wordle.Api.Services;
 

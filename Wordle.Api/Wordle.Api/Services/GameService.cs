@@ -1,6 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Diagnostics.Metrics;
-using System.Text.RegularExpressions;
 using Wordle.Api.Dtos;
 using Wordle.Api.Models;
 
@@ -70,35 +68,26 @@ public class GameService(AppDbContext db)
             .FirstOrDefaultAsync(wotd => wotd.Date == dateOnly);
 
         IEnumerable<Game> wordOfTheDayGames;
-        GameStatsDto stats;
+        GameStatsDto stats = stats = new()
+        {
+            Date = dateOnly,
+            AverageGuesses = 0,
+            TotalTimesPlayed = 0,
+            TotalWins = 0,
+            AverageSeconds = 0,
+            Usernames = []
+        };
 
         if (word is not null && word.Games.Count != 0)
         {
             wordOfTheDayGames = word.Games;
 
-            stats = new()
-            {
-                Date = word!.Date,
-                AverageGuesses = wordOfTheDayGames.Average(g => g.Attempts),
-                TotalTimesPlayed = wordOfTheDayGames.Count(),
-                TotalWins = wordOfTheDayGames.Count(g => g.IsWin),
-                AverageSeconds = wordOfTheDayGames.Average(w => w.Seconds),
-                Usernames = [.. wordOfTheDayGames.Select(g => g.AppUser!.UserName).Where(name => !string.IsNullOrEmpty(name))]
-
-            };
-
-        }
-        else
-        {
-            stats = new()
-            {
-                Date = dateOnly,
-                AverageGuesses = 0,
-                TotalTimesPlayed = 0,
-                TotalWins = 0,
-                AverageSeconds = 0,
-                Usernames = []
-            };
+            stats.Date = word!.Date;
+            stats.AverageGuesses = wordOfTheDayGames.Average(g => g.Attempts);
+            stats.TotalTimesPlayed = wordOfTheDayGames.Count();
+            stats.TotalWins = wordOfTheDayGames.Count(g => g.IsWin);
+            stats.AverageSeconds = wordOfTheDayGames.Average(w => w.Seconds);
+            stats.Usernames = [.. wordOfTheDayGames.Select(g => g.AppUser!.UserName).Where(name => !string.IsNullOrEmpty(name))];
         }
 
         return stats;
@@ -119,14 +108,14 @@ public class GameService(AppDbContext db)
 
     public GameStateDto ValidateGuess(string guess, Word word)
     {
-        var guessedWord = guess.Select(letter => new LetterState()
+        var guessedWord = guess.Select(letter => new GuessedLetterState()
         {
-            Letter = letter,
-            State = WordState.Unknown
+            Letter = char.ToLower(letter),
+            State = LetterState.Unknown
 
         }).ToArray();
 
-        var wordToGuess = word.Text;
+        string wordToGuess = word.Text.ToLower();
 
         Dictionary<char, int> letterCounts = wordToGuess
             .GroupBy(letter => letter)
@@ -137,34 +126,34 @@ public class GameService(AppDbContext db)
             if (guessedWord[i].Letter == wordToGuess[i])
             {
                 letterCounts[guessedWord[i].Letter]--;
-                guessedWord[i].State = WordState.Correct;
+                guessedWord[i].State = LetterState.Correct;
             }
         }
 
         foreach (var letterState in guessedWord)
         {
-            if (letterState.State == WordState.Unknown)
+            if (letterState.State == LetterState.Unknown)
             {
                 foreach (char letter in wordToGuess)
                 {
                     if (letterState.Letter == letter && letterCounts[letter] > 0)
                     {
-                        letterState.State = WordState.Misplaced;
+                        letterState.State = LetterState.Misplaced;
                         letterCounts[letter]--;
                     }
                 }
-                if (letterState.State == WordState.Unknown)
+                if (letterState.State == LetterState.Unknown)
                 {
-                    letterState.State = WordState.Incorrect;
+                    letterState.State = LetterState.Incorrect;
                 }
             }
         }
 
-        bool isWin = guessedWord.All(gs => gs.State == WordState.Correct);
+        bool isWin = guessedWord.All(gs => gs.State == LetterState.Correct);
 
         return new GameStateDto()
         {
-            WordStates = guessedWord.Select(ls => ls.State).ToList(),
+            LetterStates = guessedWord.Select(ls => ls.State).ToList(),
             IsWin = isWin
         };
     }
@@ -176,9 +165,9 @@ public class GameService(AppDbContext db)
         public double AverageGuesses { get; set; }
     }
 
-    public class LetterState()
+    public class GuessedLetterState()
     {
         public char Letter { get; set; }
-        public WordState State { get; set; }
+        public LetterState State { get; set; }
     }
 }

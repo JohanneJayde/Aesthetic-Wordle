@@ -39,39 +39,6 @@ export class Word {
     return this.letters.every((letter) => letter.char);
   }
 
-  public compare(secretWordString: string): boolean {
-    const secretWord = new Word({ word: secretWordString });
-    let isMatch = true;
-
-    for (const [i, letter] of secretWord.letters.entries()) {
-      if (letter.char === this.letters[i].char) {
-        this.letters[i].state = LetterState.Correct;
-        letter.state = LetterState.Correct;
-      } else {
-        isMatch = false;
-      }
-    }
-    for (const guessedLetter of this.letters) {
-      if (guessedLetter.state === LetterState.Unknown) {
-        for (const toGuessLetter of secretWord.letters) {
-          if (
-            toGuessLetter.state === LetterState.Unknown &&
-            toGuessLetter.char === guessedLetter.char
-          ) {
-            guessedLetter.state = LetterState.Misplaced;
-            toGuessLetter.state = LetterState.Misplaced;
-            break;
-          }
-        }
-        if (guessedLetter.state === LetterState.Unknown) {
-          guessedLetter.state = LetterState.Wrong;
-        }
-      }
-    }
-
-    return isMatch;
-  }
-
   public get word(): string {
     return this.letters.map((x) => x.char).join("");
   }

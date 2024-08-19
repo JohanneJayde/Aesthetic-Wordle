@@ -45,7 +45,6 @@ public class WordController(WordOfTheDayService wordOfTheDayService, WordEditorS
     }
 
     [HttpGet("FullWordsList/")]
-    [Authorize]
     public async Task<WordResultDto> GetFullWordsList()
     {
         return await wordOfTheDayService.GetAllWords();

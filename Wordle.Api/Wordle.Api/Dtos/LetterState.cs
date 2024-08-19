@@ -1,6 +1,6 @@
 ﻿namespace Wordle.Api.Dtos;
 
-public enum WordState
+public enum LetterState
 {
     Incorrect = 0,
     Misplaced = 1,

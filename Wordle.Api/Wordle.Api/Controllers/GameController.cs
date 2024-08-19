@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using Wordle.Api.Dtos;
 using Wordle.Api.Models;
 using Wordle.Api.Services;
@@ -41,16 +40,18 @@ public class GameController(GameService gameService, WordOfTheDayService wordofT
     }
 
     [HttpPost("Guess")]
-    public async Task<IActionResult> ValidateGuess(string guess, int wordId)
+    [ProducesResponseType(typeof(GameStateDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ValidateGuess(GuessDto guess)
     {
-        Word? word = await WordOfTheDayService.GetWord(wordId);
+        Word? word = await WordOfTheDayService.GetWord(guess.WordId);
 
         if (word is null)
         {
             return BadRequest("Word not found");
         }
 
-        var state = GameService.ValidateGuess(guess, word);
+        var state = GameService.ValidateGuess(guess.Guess, word);
 
         return Ok(state);
     }
