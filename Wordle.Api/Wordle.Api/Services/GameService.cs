@@ -144,7 +144,7 @@ public class GameService(AppDbContext db)
                 }
                 if (letterState.State == LetterState.Unknown)
                 {
-                    letterState.State = LetterState.Incorrect;
+                    letterState.State = LetterState.Wrong;
                 }
             }
         }

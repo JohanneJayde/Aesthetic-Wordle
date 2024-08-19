@@ -69,6 +69,41 @@ public class WordOfTheDayService(AppDbContext Db)
         return new WordResultDto() { Count = count, Items = results };
     }
 
+    public async Task<WordResultDto> GetValidWordList(List<string> guesses, int wordId, int page)
+    {
+
+        var secreteWord = Db.Words.First(word => word.WordId == wordId).Text;
+
+        var words = Db.Words.Select(w => w.Text);
+
+        var indexGrouped = guesses
+            .SelectMany((s, strIndex) => s.Select((c, charIndex) => (Letter: c, Index: charIndex)))
+            .GroupBy(x => x.Index)
+            .ToDictionary(group => group.Key, group => group.Select(x => x.Letter).ToList());
+
+        // Iterate through all words
+        foreach (var word in words)
+        {
+            // For each character
+            for(int i = 0; i < word.Length; i++) {
+            {
+
+                    // if letter has been guessed and is correct then add,
+
+                    // if word contains guessed letter at given position, then keep them
+                    if (indexGrouped[i].Contains(secreteWord[i]))
+                    {
+                        words = words.Where(word )
+                    }
+
+                // if letter has been guessed and is wrong, remove from list
+
+                // if word contains a letter that is correct but not in correct spot return
+
+                // mismatch correct words
+            }
+        }
+    }
     public async Task<WordResultDto> GetAllWords()
     {
         var queryResult =

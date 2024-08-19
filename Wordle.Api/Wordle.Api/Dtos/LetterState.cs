@@ -2,9 +2,9 @@
 
 public enum LetterState
 {
-    Incorrect = 0,
-    Misplaced = 1,
-    Unknown = 2,
-    Correct = 3
+    Unknown = 0,
+    Correct = 1,
+    Misplaced = 2,
+    Wrong = 3,
 }
 

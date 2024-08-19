@@ -48,7 +48,7 @@ public class GameServiceTests : DatabaseTestBase
         var state = GameService.ValidateGuess(guess, word);
 
         Assert.IsNotNull(state);
-        state.LetterStates[0].Should().Be(LetterState.Incorrect);
+        state.LetterStates[0].Should().Be(LetterState.Wrong);
         state.IsWin.Should().BeFalse();
     }
 
@@ -85,11 +85,11 @@ public class GameServiceTests : DatabaseTestBase
 
         GameStateDto state = GameService.ValidateGuess(guess, word);
 
-        state.LetterStates[0].Should().Be(LetterState.Incorrect);
+        state.LetterStates[0].Should().Be(LetterState.Wrong);
         state.LetterStates[1].Should().Be(LetterState.Misplaced);
         state.LetterStates[2].Should().Be(LetterState.Misplaced);
         state.LetterStates[3].Should().Be(LetterState.Misplaced);
-        state.LetterStates[4].Should().Be(LetterState.Incorrect);
+        state.LetterStates[4].Should().Be(LetterState.Wrong);
 
         state.IsWin.Should().BeFalse();
 
@@ -109,9 +109,9 @@ public class GameServiceTests : DatabaseTestBase
         GameStateDto state = GameService.ValidateGuess(guess, word);
 
         state.LetterStates[0].Should().Be(LetterState.Correct);
-        state.LetterStates[1].Should().Be(LetterState.Incorrect);
+        state.LetterStates[1].Should().Be(LetterState.Wrong);
         state.LetterStates[2].Should().Be(LetterState.Correct);
-        state.LetterStates[3].Should().Be(LetterState.Incorrect);
+        state.LetterStates[3].Should().Be(LetterState.Wrong);
         state.LetterStates[4].Should().Be(LetterState.Correct);
 
         state.IsWin.Should().BeFalse();
