@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Collections.Generic;
 using Wordle.Api.Dtos;
 using Wordle.Api.Models;
+using static Wordle.Api.Services.GameService;
 
 namespace Wordle.Api.Services;
 
@@ -72,30 +75,93 @@ public class WordOfTheDayService(AppDbContext Db)
     public async Task<WordResultDto> GetValidWordList(List<string> guesses, int wordId, int page)
     {
 
-        var secreteWord = Db.Words.First(word => word.WordId == wordId).Text.ToLower();
+        var secretWord = Db.Words.First(word => word.WordId == wordId).Text.ToLower();
 
         var words = Db.Words.Select(w => w.Text.ToLower());
 
-        var indexGrouped = ConstructLetterToGuessIndex(guesses);
+        var letterMap = ConstructLetterMapping(guesses, secretWord);
 
         List<string> validWords = [];
 
         // Iterate through all words
         foreach (var word in words)
         {
-             bool isCorrect = CheckForCorrectLetters(word, indexGrouped, secreteWord);
+             bool isCorrect = CheckForCorrectLetters(word, guesses, secretWord);
         }
 
         return new WordResultDto() { Count = 0, Items = [] };
     }
-
-    public static Dictionary<int, List<char>> ConstructLetterToGuessIndex(List<string> guesses)
+    
+    public static Dictionary<LetterState, Dictionary<int, HashSet<char>>> ConstructLetterMapping(List<string> guesses, string secretWord)
     {
-        return guesses
-            .SelectMany((s) => s.Select((c, charIndex) => (Letter: c, Index: charIndex)))
-            .GroupBy(x => x.Index)
-            .ToDictionary(group => group.Key, group => group.Select(x => x.Letter).Distinct().ToList());
+        Dictionary<char, int> letterCounts = secretWord
+            .GroupBy(letter => letter)
+            .ToDictionary(group => group.Key, group => group.Count());
 
+        Dictionary<LetterState, Dictionary<int, HashSet<char>>> letterMap = [];
+
+        letterMap.Add(LetterState.Correct, []);
+        letterMap.Add(LetterState.Wrong, []);
+        letterMap.Add(LetterState.Misplaced, []);
+
+        foreach (string guess in guesses)
+        {
+            var guessedWord = guess.Select(letter => new GuessedLetterState()
+            {
+                Letter = char.ToLower(letter),
+                State = LetterState.Unknown
+
+            }).ToArray();
+
+            for (int i = 0; i < guessedWord.Length; i++)
+            {
+                if (guessedWord[i].Letter == secretWord[i])
+                {
+                    letterCounts[guessedWord[i].Letter]--;
+                    guessedWord[i].State = LetterState.Correct;
+                }
+            }
+
+            foreach (var letterState in guessedWord)
+            {
+                if (letterState.State == LetterState.Unknown)
+                {
+                    foreach (char letter in secretWord)
+                    {
+                        if (letterState.Letter == letter && letterCounts[letter] > 0)
+                        {
+                            letterState.State = LetterState.Misplaced;
+                            letterCounts[letter]--;
+                        }
+                    }
+                    if (letterState.State == LetterState.Unknown)
+                    {
+                        letterState.State = LetterState.Wrong;
+                    }
+                }
+            }
+
+            for(int j = 0; j < guessedWord.Length; j++)
+            {
+                if(!letterMap[guessedWord[j].State].ContainsKey(j))
+                {
+                    letterMap[guessedWord[j].State].Add(j, [guessedWord[j].Letter]);
+                }
+                else
+                {
+                    letterMap[guessedWord[j].State][j].Add(guessedWord[j].Letter);
+                }
+            }
+
+            letterCounts = secretWord
+                .GroupBy(letter => letter)
+                .ToDictionary(group => group.Key, group => group.Count());
+        }
+
+        // TODO: Add in discovery count, this is how many of each letter the user has guessed
+        // either misplaced or corrrect
+
+        return letterMap;
     }
 
 
@@ -103,24 +169,84 @@ public class WordOfTheDayService(AppDbContext Db)
     /// Checks for if the current word should be included in the words list based on correct letter positions
     /// </summary>
     /// <param name="word">word to check if it should be returned</param>
-    /// <param name="indexGroups">list of letters guessed at each index</param>
+    /// <param name="guesses">list of guesses for user</param>
     /// <param name="secretWord">word that user is trying to guess</param>
     /// <returns>true, if word should be returned, false if otherwise</returns>
-    public static bool CheckForCorrectLetters(string word, Dictionary<int, List<char>> indexGroups, string secretWord)
+    public static bool CheckForCorrectLetters(string word, List<string> guesses, string secretWord)
     {
-        // Check which indices a correct letter has been guessed at
-        var correctLetters = secretWord.Select((c, index) => indexGroups[index].Contains(c)).ToList();
+        var letterMap = ConstructLetterMapping(guesses, secretWord);
 
-        // if no correct letters have been correct then return true since we can't filter
-        if (correctLetters.All(l => !l)) return true;
+        var correctLetterMap = letterMap[LetterState.Correct];
+
+        if (correctLetterMap.IsNullOrEmpty()) return true;
  
-        // map word to letter with indices
         List<(char letter, int index)> wordWithIndex = word.Select((c, index) => (c, index)).ToList();
 
-        // for all letters
-        // if user has guessed correct letter for secret word, then word to check much match guessed letter at same position
-        // else if they haven't guessed anything then return true for that letter
-        return wordWithIndex.All(wi => correctLetters[wi.index] && wi.letter == secretWord[wi.index] || !correctLetters[wi.index]);
+        return wordWithIndex.All(wi => correctLetterMap.ContainsKey(wi.index) && wi.letter == correctLetterMap[wi.index].First() || !correctLetterMap.ContainsKey(wi.index));
+    }
+
+    /// <summary>
+    /// Checks for if the current word should be included in the words list based on wrong letter positions
+    /// </summary>
+    /// <param name="word">word to check if it should be returned</param>
+    /// <param name="guesses">list of guesses for user</param>
+    /// <param name="secretWord">word that user is trying to guess</param>
+    /// <returns>true, if word should be returned, false if otherwise</returns>
+    public static bool CheckForWrongLetters(string word, List<string> guesses, string secretWord)
+    {
+
+        Dictionary<char, int> letterCounts = secretWord
+            .GroupBy(letter => letter)
+            .ToDictionary(group => group.Key, group => group.Count());
+
+        var letterMaps = ConstructLetterMapping(guesses, secretWord);
+
+        var wrongLetterMapping = letterMaps[LetterState.Wrong];
+
+        Dictionary<char, int> lettersGuessedCount = [];
+
+        Dictionary<char, int> leterCounts = letterMaps
+            .SelectMany(lm => lm.Value)
+            .SelectMany(index => index.Value)
+            .GroupBy(letter => letter)
+            .ToDictionary(letter => letter.Key, letter => letter.Count());
+
+        // get number of instances of given letters guessed.
+        // i.e if l appears twice, check how many times we have guessed it either misplaced or correct
+
+        // if it has been guessed as wrong, then remove any words with letter with occurrence above
+        // with misplaced count + correct count
+
+        // if we have guessed it
+
+        if (wrongLetterMapping.IsNullOrEmpty()) return true;
+
+        List<char> incorrectLetters = wrongLetterMapping.SelectMany(index => index.Value).Distinct().ToList();
+
+        return word.Any(incorrectLetters.Contains);
+    }
+
+    /// <summary>
+    /// Checks for if the current word should be included in the words list based on wrong letter positions
+    /// </summary>
+    /// <param name="word">word to check if it should be returned</param>
+    /// <param name="guesses">list of guesses for user</param>
+    /// <param name="secretWord">word that user is trying to guess</param>
+    /// <returns>true, if word should be returned, false if otherwise</returns>
+    public static bool CheckForMisplacedLetters(string word, List<string> guesses, string secretWord)
+    {
+        var letterMap = ConstructLetterMapping(guesses, secretWord);
+
+        var misplacedLetterMapping = letterMap[LetterState.Misplaced];
+
+        if (misplacedLetterMapping.IsNullOrEmpty()) return true;
+
+        List<(char letter, int index)> wordWithIndex = word.Select((c, index) => (c, index)).ToList();
+
+        return wordWithIndex.All(wi => 
+        misplacedLetterMapping.ContainsKey(wi.index) && 
+        wi.letter == misplacedLetterMapping[wi.index].First() || 
+        !misplacedLetterMapping.ContainsKey(wi.index));
     }
 
     public async Task<WordResultDto> GetAllWords()

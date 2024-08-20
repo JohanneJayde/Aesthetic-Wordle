@@ -37,7 +37,7 @@ public class WordOfTheDayServiceTests : DatabaseTestBase
     [DataRow("chalk", false)]
     [DataRow("floor", false)]
 
-    public async Task CheckForCorrectLetters_FirstPositionCorrectAtWord_ReturnsTrue(string wordToCheck, bool expected)
+    public async Task CheckForCorrectLetters_FirstPositionCorrectAtWord_ReturnsExpectedResult(string wordToCheck, bool expected)
     {
         Word word;
 
@@ -48,9 +48,30 @@ public class WordOfTheDayServiceTests : DatabaseTestBase
 
         List<string> guesses = ["czzzr", "anvil", "artsy", "value", "callr"];
 
-        var indexGroup = WordOfTheDayService.ConstructLetterToGuessIndex(guesses);
+        bool result = WordOfTheDayService.CheckForCorrectLetters(wordToCheck, guesses, word.Text);
 
-        bool result = WordOfTheDayService.CheckForCorrectLetters(wordToCheck, indexGroup, word.Text);
+        result.Should().Be(expected);
+    }
+
+    [DataTestMethod]
+    [DataRow("cubur", true)]
+    [DataRow("chaur", true)]
+    [DataRow("chalk", false)]
+    [DataRow("floor", false)]
+    [DataRow("alcer", false)]
+
+    public async Task CheckForWrongLetters_FirstPositionCorrectAtWord_ReturnsExpectedResult(string wordToCheck, bool expected)
+    {
+        Word word;
+
+        using (var context = new AppDbContext(Options))
+        {
+            word = await context.Words.FirstAsync(w => w.Text == "clear");
+        }
+
+        List<string> guesses = ["czzzr", "anvil", "artsy", "value", "callr"];
+
+        bool result = WordOfTheDayService.CheckForWrongLetters(wordToCheck, guesses, word.Text);
 
         result.Should().Be(expected);
     }
