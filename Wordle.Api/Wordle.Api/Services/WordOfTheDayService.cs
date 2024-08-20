@@ -72,38 +72,57 @@ public class WordOfTheDayService(AppDbContext Db)
     public async Task<WordResultDto> GetValidWordList(List<string> guesses, int wordId, int page)
     {
 
-        var secreteWord = Db.Words.First(word => word.WordId == wordId).Text;
+        var secreteWord = Db.Words.First(word => word.WordId == wordId).Text.ToLower();
 
-        var words = Db.Words.Select(w => w.Text);
+        var words = Db.Words.Select(w => w.Text.ToLower());
 
-        var indexGrouped = guesses
-            .SelectMany((s, strIndex) => s.Select((c, charIndex) => (Letter: c, Index: charIndex)))
-            .GroupBy(x => x.Index)
-            .ToDictionary(group => group.Key, group => group.Select(x => x.Letter).ToList());
+        var indexGrouped = ConstructLetterToGuessIndex(guesses);
+
+        List<string> validWords = [];
 
         // Iterate through all words
         foreach (var word in words)
         {
-            // For each character
-            for(int i = 0; i < word.Length; i++) {
-            {
-
-                    // if letter has been guessed and is correct then add,
-
-                    // if word contains guessed letter at given position, then keep them
-                    if (indexGrouped[i].Contains(secreteWord[i]))
-                    {
-                        words = words.Where(word )
-                    }
-
-                // if letter has been guessed and is wrong, remove from list
-
-                // if word contains a letter that is correct but not in correct spot return
-
-                // mismatch correct words
-            }
+             bool isCorrect = CheckForCorrectLetters(word, indexGrouped, secreteWord);
         }
+
+        return new WordResultDto() { Count = 0, Items = [] };
     }
+
+    public static Dictionary<int, List<char>> ConstructLetterToGuessIndex(List<string> guesses)
+    {
+        return guesses
+            .SelectMany((s) => s.Select((c, charIndex) => (Letter: c, Index: charIndex)))
+            .GroupBy(x => x.Index)
+            .ToDictionary(group => group.Key, group => group.Select(x => x.Letter).Distinct().ToList());
+
+    }
+
+
+    /// <summary>
+    /// Checks for if the current word should be included in the words list based on correct letter positions
+    /// </summary>
+    /// <param name="word">word to check if it should be returned</param>
+    /// <param name="indexGroups">list of letters guessed at each index</param>
+    /// <param name="secretWord">word that user is trying to guess</param>
+    /// <returns>true, if word should be returned, false if otherwise</returns>
+    public static bool CheckForCorrectLetters(string word, Dictionary<int, List<char>> indexGroups, string secretWord)
+    {
+        // Check which indices a correct letter has been guessed at
+        var correctLetters = secretWord.Select((c, index) => indexGroups[index].Contains(c)).ToList();
+
+        // if no correct letters have been correct then return true since we can't filter
+        if (correctLetters.All(l => !l)) return true;
+ 
+        // map word to letter with indices
+        List<(char letter, int index)> wordWithIndex = word.Select((c, index) => (c, index)).ToList();
+
+        // for all letters
+        // if user has guessed correct letter for secret word, then word to check much match guessed letter at same position
+        // else if they haven't guessed anything then return true for that letter
+        return wordWithIndex.All(wi => correctLetters[wi.index] && wi.letter == secretWord[wi.index] || !correctLetters[wi.index]);
+    }
+
     public async Task<WordResultDto> GetAllWords()
     {
         var queryResult =
