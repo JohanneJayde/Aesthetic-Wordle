@@ -30,13 +30,12 @@ public class GameController(GameService gameService, WordOfTheDayService wordofT
 
         if (user is null)
         {
-            return BadRequest("An error occurred while processing your request.");
+            return Unauthorized("User not found");
         }
 
         Game game = await GameService.PostGameResult(user, word, gameDto);
-        var stats = await GameService.GetGameStats(game);
 
-        return Ok(stats);
+        return Ok(game);
     }
 
     [HttpPost("Guess")]
@@ -51,7 +50,7 @@ public class GameController(GameService gameService, WordOfTheDayService wordofT
             return BadRequest("Word not found");
         }
 
-        var state = GameService.ValidateGuess(guess.Guess, word);
+        var state = GameService.ValidateGuess(guess.Guess, guess.AttemptNumber, word);
 
         return Ok(state);
     }

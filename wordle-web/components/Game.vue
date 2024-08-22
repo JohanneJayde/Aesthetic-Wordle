@@ -139,7 +139,7 @@
             {{ gameMessage }}
           </v-card-title>
           <v-card-text v-if="game.gameState !== GameState.Playing" class="my-3">
-            The word was: <strong>{{ game.secretWord }}</strong>
+            The word was: <strong>{{ game.solution?.toUpperCase() }}</strong>
           </v-card-text>
           <v-card-text v-else class="my-3">
             You still have <strong>{{ 6 - game.guessIndex }}</strong> attempts
@@ -234,18 +234,6 @@ function closeGameDialog() {
   stopwatch.value.start();
 }
 
-async function saveScore() {
-  let scoreUrl = "player/saveScore";
-  let data = {
-    name: playerName.value,
-    attempts: game.guessIndex + 1,
-    seconds: stopwatch.value.getCurrentTime(),
-  };
-  await Axios.post(scoreUrl, data, {
-    headers: { "Content-Type": "application/json" },
-  }).catch((err) => console.log(err));
-}
-
 const formattedDate = computed(() => {
   return dateUtils.getFormattedDateWithOrdianl(addDays(new Date(date!), 1));
 });
@@ -279,7 +267,6 @@ watch(
         gameStateColor.value = "win";
         playWinSound(volumne.value);
         stopwatch.value.stop();
-        saveScore();
         isGameOver.value = true;
         break;
 

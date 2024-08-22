@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using Wordle.Api.Dtos;
 using Wordle.Api.Identity;
 using Wordle.Api.Models;
@@ -13,10 +12,11 @@ namespace Wordle.Api.Controllers;
 public class WordController(WordOfTheDayService wordOfTheDayService, WordEditorService wordEditorService) : ControllerBase
 {
     [HttpGet("RandomWord")]
-    public async Task<string> GetRandomWord()
+    public async Task<int> GetRandomWord()
     {
-        var randomWord = await wordOfTheDayService.GetRandomWord();
-        return randomWord.Text;
+        Word randomWord = await wordOfTheDayService.GetRandomWord();
+
+        return randomWord.WordId;
     }
 
     /// <summary>
@@ -28,14 +28,20 @@ public class WordController(WordOfTheDayService wordOfTheDayService, WordEditorS
     public async Task<int> GetWordOfDay(double offsetInHours = -7.0)
     {
         DateOnly today = DateOnly.FromDateTime(DateTime.UtcNow.AddHours(offsetInHours));
-        return await wordOfTheDayService.GetWordOfTheDay(today);
+
+        Word wordOfTheDay = await wordOfTheDayService.GetWordOfTheDay(today);
+
+        return wordOfTheDay.WordId;
     }
 
     [HttpGet("WordOfTheDay/{date}")]
     public async Task<int> GetWordOfDay(DateTime date)
     {
         DateOnly dateOnly = DateOnly.FromDateTime(date);
-        return await wordOfTheDayService.GetWordOfTheDay(dateOnly);
+
+        Word wordOfTheDay = await wordOfTheDayService.GetWordOfTheDay(dateOnly);
+
+        return wordOfTheDay.WordId;
     }
 
     [HttpGet("WordsList/")]
@@ -43,6 +49,13 @@ public class WordController(WordOfTheDayService wordOfTheDayService, WordEditorS
     {
         return await wordOfTheDayService.GetWordsList(query, page, pageSize);
     }
+
+    [HttpGet("ValidWordsList/")]
+    public async Task<WordResultDto> GetValidWordsList(string query = "", int page = 1, int pageSize = 10)
+    {
+        return await wordOfTheDayService.GetWordsList(query, page, pageSize);
+    }
+
 
     [HttpGet("FullWordsList/")]
     public async Task<WordResultDto> GetFullWordsList()

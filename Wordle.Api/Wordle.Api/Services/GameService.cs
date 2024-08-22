@@ -28,23 +28,6 @@ public class GameService(AppDbContext db)
         return game;
     }
 
-    public async Task<GameStatsDto> GetGameStats(Game game)
-    {
-        var gamesForWord = Db.Games.Where(g => g.WordId == game.WordId);
-
-        GameStatsDto stats = new()
-        {
-            Word = game.Word!.Text,
-            AverageGuesses = await gamesForWord.AverageAsync(g => g.Attempts),
-            TotalTimesPlayed = await gamesForWord.CountAsync(),
-            AverageSeconds = await gamesForWord.AverageAsync(g => g.Seconds),
-            TotalWins = await gamesForWord.CountAsync(g => g.IsWin),
-            Usernames = [.. gamesForWord.Select(g => g.AppUser!.UserName).Where(name => !string.IsNullOrEmpty(name))]
-        };
-
-        return stats;
-    }
-
     public IQueryable<AllWordStats> StatsForAllWords()
     {
         IQueryable<AllWordStats> result = Db.Games
@@ -106,7 +89,7 @@ public class GameService(AppDbContext db)
         return wordOfTheDayGames;
     }
 
-    public GameStateDto ValidateGuess(string guess, Word word)
+    public GameStateDto ValidateGuess(string guess, int attemptNumber, Word word)
     {
         var guessedWord = guess.Select(letter => new GuessedLetterState()
         {
@@ -154,7 +137,8 @@ public class GameService(AppDbContext db)
         return new GameStateDto()
         {
             LetterStates = guessedWord.Select(ls => ls.State).ToList(),
-            IsWin = isWin
+            IsWin = isWin,
+            Solution = isWin || attemptNumber == 6 ? wordToGuess : null,
         };
     }
 
