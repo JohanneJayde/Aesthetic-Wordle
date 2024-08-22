@@ -72,7 +72,9 @@
                 style="position: sticky; left: 50px"
                 class="text-center bg-surface"
               >
-                {{ player.name }}
+                <router-link :to="'/User/' + player.userId">
+                  {{ player.userName }}
+                </router-link>
               </td>
 
               <td class="text-center">{{ player.gameCount }}</td>
@@ -136,8 +138,8 @@
 import "../animations/fireworks.scss";
 import Axios from "axios";
 interface Player {
-  playerId: number;
-  name: string;
+  userId: string;
+  userName: string;
   gameCount: number;
   averageAttempts: number;
   averageSeconds: 0;
@@ -157,8 +159,8 @@ onMounted(() => {
     .then((res: { data: any }) => res.data)
     .then((data: any) =>
       data.map((player: any) => ({
-        playerId: player.playerId,
-        name: player.name,
+        userId: player.user.id,
+        userName: player.user.userName,
         gameCount: player.gameCount,
         averageAttempts: player.averageAttempts,
         averageSeconds: player.averageSeconds,

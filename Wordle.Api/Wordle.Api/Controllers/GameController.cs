@@ -37,20 +37,9 @@ public class GameController(GameService gameService, WordOfTheDayService wordofT
             return Unauthorized("User not found");
         }
 
-        Game game = await GameService.PostGameResult(user, word, gameDto);
+        GameResponseDto gameResponse = await GameService.PostGameResult(user, word, gameDto);
 
-        GameResponseDto gameResponseDto = new()
-        {
-            Id = game.GameId,
-            Attempts = game.Attempts,
-            Seconds = game.Seconds,
-            IsWin = game.IsWin,
-            DateAttempted = game.DateAttempted,
-            AppUserId = game.AppUserId,
-            WordId = game.WordId,
-        };
-
-        return Ok(gameResponseDto);
+        return Ok(gameResponse);
     }
 
     [HttpPost("Guess")]

@@ -52,6 +52,7 @@ const gameStats = ref<GameStats[]>([]);
 
 onMounted(() => {
   const formatDate = format(new Date(), "MM-dd-yyyy");
+  console.log(formatDate);
   date.value = formatDate;
   Axios.get("game/LastTenWordOfTheDayStats/" + formatDate)
     .then((res: { data: any }) => res.data)

@@ -7,7 +7,7 @@ public class GameService(AppDbContext db)
 {
     public AppDbContext Db { get; set; } = db;
 
-    public async Task<Game> PostGameResult(AppUser user, Word word, GameDto gameDto)
+    public async Task<GameResponseDto> PostGameResult(AppUser user, Word word, GameDto gameDto)
     {
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
@@ -32,7 +32,18 @@ public class GameService(AppDbContext db)
 
         await Db.SaveChangesAsync();
 
-        return game;
+        GameResponseDto gameResponseDto = new()
+        {
+            Id = game.GameId,
+            Attempts = game.Attempts,
+            Seconds = game.Seconds,
+            IsWin = game.IsWin,
+            DateAttempted = game.DateAttempted,
+            AppUserId = game.AppUserId,
+            WordId = game.WordId,
+        };
+
+        return gameResponseDto;
     }
 
     public IQueryable<AllWordStats> StatsForAllWords()
@@ -55,9 +66,9 @@ public class GameService(AppDbContext db)
 
         WordOfTheDay? word = await Db.WordsOfTheDays
             .Include(wotd => wotd.Games)
+                .ThenInclude(game => game.AppUser)
             .FirstOrDefaultAsync(wotd => wotd.Date == dateOnly);
 
-        IEnumerable<Game> wordOfTheDayGames;
         GameStatsDto stats = stats = new()
         {
             Date = dateOnly,
@@ -65,19 +76,24 @@ public class GameService(AppDbContext db)
             TotalTimesPlayed = 0,
             TotalWins = 0,
             AverageSeconds = 0,
-            Usernames = []
+            Users = []
         };
 
         if (word is not null && word.Games.Count != 0)
         {
-            wordOfTheDayGames = word.Games;
-
             stats.Date = word!.Date;
-            stats.AverageGuesses = wordOfTheDayGames.Average(g => g.Attempts);
-            stats.TotalTimesPlayed = wordOfTheDayGames.Count();
-            stats.TotalWins = wordOfTheDayGames.Count(g => g.IsWin);
-            stats.AverageSeconds = wordOfTheDayGames.Average(w => w.Seconds);
-            stats.Usernames = [.. wordOfTheDayGames.Select(g => g.AppUser!.UserName).Where(name => !string.IsNullOrEmpty(name))];
+            stats.AverageGuesses = word.Games.Average(g => g.Attempts);
+            stats.TotalTimesPlayed = word.Games.Count;
+            stats.TotalWins = word.Games.Count(g => g.IsWin);
+            stats.AverageSeconds = word.Games.Average(w => w.Seconds);
+            stats.Users = word.Games.Where(g => g.AppUser != null)
+                            .GroupBy(g => g.AppUser!.Id)
+                            .Select(group => group.First().AppUser)
+                            .Select(user => new AppUserDto()
+                            {
+                                UserName = user!.UserName!,
+                                Id = user!.Id,
+                            }).ToList();
         }
 
         return stats;

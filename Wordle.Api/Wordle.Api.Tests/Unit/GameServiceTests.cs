@@ -45,7 +45,7 @@ public class GameServiceTests : DatabaseTestBase
 
         Assert.IsNotNull(word);
 
-        var state = GameService.ValidateGuess(guess,3, word);
+        var state = GameService.ValidateGuess(guess, 3, word);
 
         Assert.IsNotNull(state);
         state.LetterStates[0].Should().Be(LetterState.Wrong);
@@ -106,7 +106,7 @@ public class GameServiceTests : DatabaseTestBase
             word = await context.Words.FirstAsync(w => w.Text == "snips");
         }
 
-        GameStateDto state = GameService.ValidateGuess(guess,3, word);
+        GameStateDto state = GameService.ValidateGuess(guess, 3, word);
 
         state.LetterStates[0].Should().Be(LetterState.Correct);
         state.LetterStates[1].Should().Be(LetterState.Wrong);

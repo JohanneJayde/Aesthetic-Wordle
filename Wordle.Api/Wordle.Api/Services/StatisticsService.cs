@@ -18,7 +18,14 @@ public class StatisticsService(AppDbContext db)
             TotalTimesPlayed = games.Count(),
             TotalWins = games.Count(g => g.IsWin),
             AverageSeconds = games.Average(w => w.Seconds),
-            Usernames = [.. games.Select(g => g.AppUser!.UserName).Where(name => !string.IsNullOrEmpty(name))]
+            Users = games.Where(g => g.AppUser != null)
+                            .GroupBy(g => g.AppUser!.Id)
+                            .Select(group => group.First().AppUser)
+                            .Select(user => new AppUserDto()
+                            {
+                                UserName = user!.UserName!,
+                                Id = user!.Id,
+                            }).ToList()
 
         };
 
@@ -27,15 +34,22 @@ public class StatisticsService(AppDbContext db)
 
     public IEnumerable<PlayerDto> TopTenPlayers()
     {
-        return Db.Users.OrderBy(player => player.AverageAttempts)
+        return Db.Users.Where(u => u.GameCount > 0)
+            .OrderBy(player => player.AverageAttempts)
             .ThenBy(player => player.GameCount)
             .ThenBy(player => player.AverageSecondsPerGame)
             .Select(player =>
-            new PlayerDto(){ 
-                Name = player.UserName!, 
-                GameCount = player.GameCount, 
-                AverageAttempts = player.AverageAttempts, 
-                AverageSeconds = player.AverageSecondsPerGame })
+            new PlayerDto()
+            {
+                User = new AppUserDto()
+                {
+                    UserName = player.UserName!,
+                    Id = player.Id
+                },
+                GameCount = player.GameCount,
+                AverageAttempts = player.AverageAttempts,
+                AverageSeconds = player.AverageSecondsPerGame
+            })
             .Take(10);
     }
 }
