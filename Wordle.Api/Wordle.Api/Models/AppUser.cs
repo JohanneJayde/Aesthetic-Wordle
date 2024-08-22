@@ -9,5 +9,7 @@ public class AppUser : IdentityUser
     public double AverageAttempts { get; set; }
 
     public int AverageSecondsPerGame { get; set; }
+
+    public ICollection<Game> Games { get; set; } = new List<Game>();
 }
 

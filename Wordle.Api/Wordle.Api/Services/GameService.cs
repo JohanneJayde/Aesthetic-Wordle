@@ -24,7 +24,14 @@ public class GameService(AppDbContext db)
         };
 
         Db.Games.Add(game);
+
+        user.GameCount++;
+
+        user.AverageAttempts = ((user.AverageAttempts * (user.GameCount - 1)) + gameDto.Attempts) / user.GameCount;
+        user.AverageSecondsPerGame = ((user.AverageSecondsPerGame * (user.GameCount - 1)) + gameDto.Seconds) / user.GameCount;
+
         await Db.SaveChangesAsync();
+
         return game;
     }
 

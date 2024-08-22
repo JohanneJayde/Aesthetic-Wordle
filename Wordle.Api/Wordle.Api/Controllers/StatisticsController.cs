@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Wordle.Api.Dtos;
-using Wordle.Api.Models;
 using Wordle.Api.Services;
 
 namespace Wordle.Api.Controllers;
@@ -20,4 +19,11 @@ public class StatisticsController(StatisticsService StatisticsService) : Control
         return stats;
     }
 
+    [HttpGet("Leaderboard")]
+    public IEnumerable<PlayerDto> GetLeaderboard()
+    {
+        return StatisticsService.TopTenPlayers();
+    }
 }
+
+

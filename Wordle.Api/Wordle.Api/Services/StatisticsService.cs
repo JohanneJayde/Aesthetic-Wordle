@@ -24,5 +24,19 @@ public class StatisticsService(AppDbContext db)
 
         return stats;
     }
+
+    public IEnumerable<PlayerDto> TopTenPlayers()
+    {
+        return Db.Users.OrderBy(player => player.AverageAttempts)
+            .ThenBy(player => player.GameCount)
+            .ThenBy(player => player.AverageSecondsPerGame)
+            .Select(player =>
+            new PlayerDto(){ 
+                Name = player.UserName!, 
+                GameCount = player.GameCount, 
+                AverageAttempts = player.AverageAttempts, 
+                AverageSeconds = player.AverageSecondsPerGame })
+            .Take(10);
+    }
 }
 

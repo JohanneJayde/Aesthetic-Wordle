@@ -15,8 +15,12 @@ public class GameController(GameService gameService, WordOfTheDayService wordofT
     public WordOfTheDayService WordOfTheDayService { get; set; } = wordofTheDayService;
     public UserManager<AppUser> UserManager { get; set; } = userManager;
 
-    [HttpPost("Result")]
+    [HttpPost("SaveResult")]
     [Authorize]
+    [ProducesResponseType(typeof(GameResponseDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
+
     public async Task<IActionResult> PostGame(GameDto gameDto)
     {
         Word? word = await WordOfTheDayService.GetWord(gameDto.WordId);
@@ -35,7 +39,18 @@ public class GameController(GameService gameService, WordOfTheDayService wordofT
 
         Game game = await GameService.PostGameResult(user, word, gameDto);
 
-        return Ok(game);
+        GameResponseDto gameResponseDto = new()
+        {
+            Id = game.GameId,
+            Attempts = game.Attempts,
+            Seconds = game.Seconds,
+            IsWin = game.IsWin,
+            DateAttempted = game.DateAttempted,
+            AppUserId = game.AppUserId,
+            WordId = game.WordId,
+        };
+
+        return Ok(gameResponseDto);
     }
 
     [HttpPost("Guess")]

@@ -49,7 +49,7 @@ public class WordOfTheDayService(AppDbContext Db)
             await Db.SaveChangesAsync();
         }
 
-        return wordOfTheDay.Word;
+        return wordOfTheDay.Word!;
     }
 
     public async Task<WordResultDto> GetWordsList(string query, int page, int pageSize)

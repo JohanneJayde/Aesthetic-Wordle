@@ -137,13 +137,18 @@ export class Game {
       this.isBusy = true;
 
       if (this.tokenService.isLoggedIn()) {
-        await Axios.post("/Game/Result", {
+        const config = {
+          headers: { Authorization: `Bearer ${this.tokenService.getToken()}` },
+        };
+
+        const body = {
           attempts: this.guessIndex + 1,
           isWin: this.gameState === GameState.Won,
-          word: this.secretWordId,
-          name: name,
+          wordId: this.secretWordId,
           seconds: currentTime,
-        });
+        };
+
+        await Axios.post("/Game/SaveResult", body, config);
       }
 
       this.isBusy = false;

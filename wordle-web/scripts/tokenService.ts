@@ -19,7 +19,6 @@ export default class TokenService {
     if (token === "") {
       return "";
     }
-    console.log(JSON.parse(atob(token.split(".")[1])));
     return JSON.parse(atob(token.split(".")[1])).userName;
   }
 
