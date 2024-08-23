@@ -11,11 +11,9 @@ export class Game {
   public guessIndex: number = 0;
   public gameState: GameState = GameState.Playing;
   public guessedLetters: Letter[] = [];
-  public isBusy: boolean = false;
   private _secretWordId: number = -1;
   private _solution: string | null = null;
   public wordsList: string[] = [];
-  private tokenService: TokenService = new TokenService();
 
   private set secretWordId(value: number) {
     this._secretWordId = value;
@@ -30,13 +28,10 @@ export class Game {
 
   constructor(maxAttempts: number = 6) {
     this.maxAttempts = maxAttempts;
-    this.isBusy = true;
     this.gameState = GameState.Initializing;
   }
 
   public async startNewGame(wordId: number) {
-    this.isBusy = true;
-
     this.secretWordId = wordId;
 
     this.guessIndex = 0;
@@ -48,7 +43,6 @@ export class Game {
     }
 
     this.gameState = GameState.Playing;
-    this.isBusy = false;
   }
 
   public setWordsList(words: string[]) {
@@ -95,7 +89,7 @@ export class Game {
     }
   }
 
-  public async submitGuess(currentTime: number = 0) {
+  public async submitGuess() {
     if (this.gameState !== GameState.Playing) return;
     if (!this.guess.isFilled) return;
     if (!this.isValidWord(this.guess)) {
@@ -126,27 +120,6 @@ export class Game {
       } else {
         this.guessIndex++;
       }
-    }
-
-    if (this.gameState === GameState.Won || this.gameState === GameState.Lost) {
-      this.isBusy = true;
-
-      if (this.tokenService.isLoggedIn()) {
-        const config = {
-          headers: { Authorization: `Bearer ${this.tokenService.getToken()}` },
-        };
-
-        const body = {
-          attempts: this.guessIndex + 1,
-          isWin: this.gameState === GameState.Won,
-          wordId: this.secretWordId,
-          seconds: currentTime,
-        };
-
-        await Axios.post("/Game/SaveResult", body, config);
-      }
-
-      this.isBusy = false;
     }
   }
 

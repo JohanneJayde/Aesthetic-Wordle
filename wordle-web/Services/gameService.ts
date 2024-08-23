@@ -15,4 +15,25 @@ export default class GameService {
 
     return response.data;
   }
+
+  public static async submitGame(
+    attempts: number,
+    wordId: number,
+    isWin: boolean,
+    seconds: number,
+    token: string
+  ) {
+    const config = {
+      headers: { Authorization: `Bearer ${token}` },
+    };
+
+    const body = {
+      attempts: attempts + 1,
+      isWin: isWin,
+      wordId: wordId,
+      seconds: seconds,
+    };
+
+    await Axios.post("/Game/SaveResult", body, config);
+  }
 }

@@ -154,6 +154,8 @@ import {
 } from "../scripts/soundUtils";
 import type { WordDto } from "~/Models/WordDto";
 import { WordService } from "~/Services/WordService";
+import GameService from "~/Services/GameService";
+import TokenService from "~/Services/tokenService";
 
 const props = withDefaults(
   defineProps<{
@@ -173,6 +175,7 @@ const itemSelect = ref("");
 const date = route.query.date?.toString();
 const volumne = ref(0.5);
 const wordsList = ref<string[]>([]);
+const tokenService = new TokenService();
 
 const wordId = await getWordId();
 
@@ -226,6 +229,17 @@ watch(
         playWinSound(volumne.value);
         stopwatch.value.stop();
         isGameOver.value = true;
+
+        if (tokenService.isLoggedIn()) {
+          GameService.submitGame(
+            game.guessIndex + 1,
+            wordId,
+            game.gameState === GameState.Won,
+            stopwatch.value.getCurrentTime(),
+            tokenService.getToken()
+          );
+        }
+
         break;
 
       case GameState.Lost:
@@ -234,6 +248,16 @@ watch(
         playLoseSound(volumne.value);
         stopwatch.value.stop();
         isGameOver.value = true;
+
+        if (tokenService.isLoggedIn()) {
+          GameService.submitGame(
+            game.guessIndex + 1,
+            wordId,
+            game.gameState === GameState.Won,
+            stopwatch.value.getCurrentTime(),
+            tokenService.getToken()
+          );
+        }
         break;
 
       case GameState.Playing:
@@ -248,7 +272,7 @@ watch(
 async function handleClick(value: string) {
   if (value === "ENTER") {
     let currentGuessIndex = game.guessIndex;
-    await game.submitGuess(stopwatch.value.getCurrentTime());
+    await game.submitGuess();
 
     if (currentGuessIndex !== game.guessIndex) {
       playEnterSound(volumne.value);
