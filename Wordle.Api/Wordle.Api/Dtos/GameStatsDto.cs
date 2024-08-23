@@ -16,6 +16,6 @@ public class GameStatsDto
 
     public int TotalLosses { get => TotalTimesPlayed - TotalWins; }
 
-    public List<string> Usernames { get; set; } = [];
+    public List<AppUserDto> Users { get; set; } = [];
 }
 

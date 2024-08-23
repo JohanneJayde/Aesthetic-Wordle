@@ -1,82 +1,104 @@
 <template>
   <v-card elevation="5">
     <v-sheet color="primary" class="py-2">
-      <V-card-title v-if="isDaily">{{ ordinalDate }}</V-card-title>
-      <v-card-title v-else>{{ gameStat.word }}</v-card-title>
+      <v-row>
+        <v-col>
+          <V-card-title v-if="isDaily">{{ ordinalDate }}</V-card-title>
+          <v-card-title v-else>{{ gameStat.word }}</v-card-title>
+        </v-col>
+        <v-col class="d-flex justify-end align-center mr-3">
+          <v-chip
+            v-if="hasPlayed"
+            prepend-icon="mdi-check"
+            variant="flat"
+            size="large"
+            class="text-white"
+            color="win"
+          >
+            Completed</v-chip
+          >
+        </v-col>
+      </v-row>
     </v-sheet>
-    <v-row class="mt-1">
-      <v-col class="ml-2">
-        <v-card-text class="font-weight-bold text-h7"
-          >Total Wins: {{ gameStat.totalWins }}</v-card-text
-        >
-        <v-card-text class="font-weight-bold text-h7"
-          >Total Losses: {{ gameStat.totalLosses }}</v-card-text
-        >
-        <v-card-text class="font-weight-bold text-h7"
-          >Average Seconds:
-          {{ gameStat.averageSeconds.toFixed(2) }}</v-card-text
-        >
-        <v-chip
-          v-if="hasPlayed"
-          class="mx-3 mt-1"
-          varient="tonal"
-          color="success"
-        >
-          <v-icon>mdi-check</v-icon> You have played
-        </v-chip>
-        <v-chip v-else class="mx-3 mt-1" varient="tonal" color="error">
-          <v-icon>mdi-close</v-icon> You have not played
-        </v-chip>
-      </v-col>
-      <v-col>
-        <v-card-text class="font-weight-bold text-h7 text-center"
-          >Average Attempts</v-card-text
-        >
-        <v-progress-circular
-          :rotate="360"
-          :width="7"
-          color="win"
-          class="mx-auto font-weight-bold d-flex justify-center align-center"
-          size="80"
-          :model-value="averageAttempts"
-        >
-          {{ averageAttempts }}%</v-progress-circular
-        >
-        <v-card-text class="font-weight-bold text-h7 text-center"
-          >Win Percentage</v-card-text
-        >
-        <v-progress-circular
-          :rotate="360"
-          :width="7"
-          color="warning"
-          class="mx-auto font-weight-bold d-flex justify-center align-center"
-          size="80"
-          :model-value="winPercentage"
-        >
-          {{ winPercentage }}%</v-progress-circular
-        >
-      </v-col>
-    </v-row>
-    <v-card-actions class="py-5">
+    <v-card-item>
+      <v-row no-gutters>
+        <v-col cols="12" class="mb-3">
+          <span><b>Win Percentage:</b> {{ winPercentage }}%</span>
+          <v-progress-linear
+            :model-value="winPercentage"
+            color="win"
+            height="10"
+          />
+        </v-col>
+        <v-col cols="12" class="mb-3">
+          <span
+            ><b>Average Attempts:</b>
+            {{ gameStat.averageGuesses.toFixed(2) }}</span
+          >
+          <v-progress-linear
+            :model-value="averageAttempts"
+            color="warning"
+            height="10"
+          />
+        </v-col>
+
+        <v-col>
+          <v-list>
+            <span>
+              <b
+                >Total Wins
+                <v-icon icon="mdi-trophy" color="primary" size="small" />:</b
+              >
+              {{ gameStat.totalWins }} </span
+            ><br />
+            <span>
+              <b
+                >Total Losses
+                <v-icon icon="mdi-close" color="primary" size="small" />:</b
+              >
+              {{ gameStat.totalLosses }} </span
+            ><br />
+            <span>
+              <b
+                >Average Seconds
+                <v-icon icon="mdi-clock" color="primary" size="small" />:</b
+              >
+              {{ gameStat.averageSeconds.toFixed(2) }} </span
+            ><br />
+            <span>
+              <b
+                >User Plays
+                <v-icon
+                  icon="mdi-account-multiple"
+                  color="primary"
+                  size="small"
+                />:</b
+              >
+              {{ gameStat.users.length }} </span
+            ><br />
+          </v-list>
+        </v-col>
+      </v-row>
+    </v-card-item>
+    <v-card-actions>
       <v-btn
         v-if="isDaily"
-        class="pa-2 px-5 mx-3 mb-4 bg-primary"
+        class="pa-2 ml-2 mb-3 bg-primary"
         color="white"
+        :disabled="hasPlayed"
         :to="`/Wordle/Daily?date=${formattedDate}`"
         >Play Word</v-btn
-      ></v-card-actions
-    >
-    <v-sheet color="primary" height="5px" />
+      >
+    </v-card-actions>
+    <v-sheet color="primary" height="5px" class="mb-0" />
   </v-card>
 </template>
 
 <script setup lang="ts">
-import { format, addDays } from "date-fns";
+import { addDays } from "date-fns";
 import type { GameStats } from "~/Models/GameStas";
-import nuxtStorage from "nuxt-storage";
 import dateUtils from "~/scripts/dateUtils";
-
-const playerName = ref("");
+import TokenService from "~/scripts/tokenService";
 
 const props = withDefaults(
   defineProps<{
@@ -85,15 +107,16 @@ const props = withDefaults(
     inCurrentGame: boolean;
   }>(),
   {
-    hasPlayed: false,
     isDaily: false,
     inCurrentGame: true,
   }
 );
 
+const tokenService = new TokenService();
+
 const winPercentage = computed(() => {
   if (props.gameStat.totalGames === 0) {
-    return "0"; // or any other default value
+    return "0";
   }
   return ((props.gameStat.totalWins / props.gameStat.totalGames) * 100).toFixed(
     2
@@ -115,11 +138,8 @@ const formattedDate = computed(() => {
 });
 
 const hasPlayed = computed(() => {
-  return props.gameStat.usernames.includes(playerName.value);
-});
-
-onMounted(async () => {
-  const defaultName = nuxtStorage.localStorage.getData("name");
-  playerName.value = defaultName ? defaultName : "Guest";
+  return props.gameStat.users.some(
+    (user) => user.userName === tokenService.getUserName()
+  );
 });
 </script>

@@ -9,8 +9,6 @@ public class AppDbContext : IdentityDbContext<AppUser>
     public DbSet<Game> Games { get; set; }
     public DbSet<Word> Words { get; set; }
 
-    public DbSet<Player> Players { get; set; }
-        
     public AppDbContext(DbContextOptions<AppDbContext> options)
         : base(options)
     {

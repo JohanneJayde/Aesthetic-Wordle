@@ -2,7 +2,7 @@
 
 public class PlayerDto
 {
-    public string Name { get; set; } = null!;
+    public AppUserDto User { get; set; } = null!;
     public int GameCount { get; set; }
     public double AverageAttempts { get; set; }
     public int AverageSeconds { get; set; }

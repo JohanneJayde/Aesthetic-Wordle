@@ -41,8 +41,7 @@ import { useDisplay } from 'vuetify/lib/framework.mjs';
 import { useTheme } from "vuetify";
 
 useHead({
-  title: "About Us",
-  meta: [{ name: "description", content: "Cool site!" }],
+  title: "About Us | Aesthetic Wordle",
 });
 
 const theme = useTheme();

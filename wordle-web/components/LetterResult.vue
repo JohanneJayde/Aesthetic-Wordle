@@ -57,10 +57,9 @@
 <script setup lang="ts">
 import { Letter } from "~/scripts/letter";
 import { useDisplay } from "vuetify";
-import { Game } from "~/scripts/game";
 import { LetterState } from "~/scripts/letter";
 
-const props = withDefaults(
+withDefaults(
   defineProps<{
     letter: Letter;
     clickable?: boolean;
@@ -72,7 +71,6 @@ const props = withDefaults(
   }
 );
 
-const game: Game | undefined = inject("GAME");
 const boxSize = ref(60);
 const display = useDisplay();
 const keySize = ref(40);

@@ -58,10 +58,6 @@
             <v-icon> mdi-flag-variant</v-icon>
             This will restart your game if you wish to reset and start over.
           </v-card-text>
-          <v-card-text>
-            <v-icon> mdi-account</v-icon>
-            Save your name for our leaderboard. Have fun!
-          </v-card-text>
         </v-card>
       </v-col>
     </v-row>
@@ -85,8 +81,7 @@ import { Letter, LetterState } from "~/scripts/letter";
 import { Word } from "~/scripts/word";
 
 useHead({
-  title: "How to Play",
-  meta: [{ name: "description", content: "Cool site!" }],
+  title: "How to Play | Aesthetic Wordle",
 });
 
 const exampleWord = new Word({ word: "BASED" });

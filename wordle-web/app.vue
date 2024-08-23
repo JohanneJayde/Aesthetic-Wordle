@@ -15,20 +15,17 @@
         style="cursor: pointer"
       />
       <v-app-bar-title> </v-app-bar-title>
-
-      <v-btn v-if="$vuetify.display.smAndUp" @click="showLoginLogOut">
-        {{ tokenService.isLoggedIn() ? tokenService.getUserName() : "Log In" }}
+      <v-btn
+        v-if="tokenService.isLoggedIn()"
+        :to="'/User/' + tokenService.getUserId()"
+      >
+        {{ tokenService.getUserName() }}
       </v-btn>
       <v-btn
-        v-else
         @click="showLoginLogOut"
         :icon="tokenService.isLoggedIn() ? 'mdi-account' : 'mdi-login'"
       />
-
-      <v-app-bar-nav-icon
-        icon="mdi-help-circle"
-        @click="$router.push('/Instructions')"
-      />
+      <v-app-bar-nav-icon icon="mdi-help-circle" to="/Instructions" />
       <v-app-bar-nav-icon icon="mdi-cog" @click="showSettingsDialog = true" />
     </v-app-bar>
     <v-navigation-drawer

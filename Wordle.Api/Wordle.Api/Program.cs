@@ -61,10 +61,10 @@ builder.Services.AddSwaggerGen(config =>
 );
 
 builder.Services.AddScoped<WordOfTheDayService>();
-builder.Services.AddScoped<PlayerServices>();
 builder.Services.AddScoped<GameService>();
 builder.Services.AddScoped<StatisticsService>();
 builder.Services.AddScoped<WordEditorService>();
+builder.Services.AddScoped<UserService>();
 
 // Identity Services
 builder.Services.AddIdentityCore<AppUser>(options => options.SignIn.RequireConfirmedAccount = false)
@@ -94,7 +94,6 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 //Add Policies
 builder.Services.AddAuthorization(options =>
 {
-    options.AddPolicy(Policies.AddOrDeleteWord, Policies.AddOrDeleteWordPolicy);
 });
 
 

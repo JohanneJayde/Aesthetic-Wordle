@@ -8,7 +8,7 @@ public static class Seeder
     {
         if (!db.Words.Any())
         {
-            foreach(var word in WordOfTheDayService.WordList())
+            foreach (var word in WordOfTheDayService.WordList())
             {
                 db.Words.Add(new Word() { Text = word });
             }

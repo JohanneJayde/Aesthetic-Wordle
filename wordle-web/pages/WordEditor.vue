@@ -164,8 +164,7 @@ const isEditUser = computed(
 const isLoggedIn = computed(() => tokenService.isLoggedIn());
 
 useHead({
-  title: "Word Editor",
-  meta: [{ name: "description", content: "Cool site!" }],
+  title: "Word Editor | Aesthetic Wordle",
 });
 
 watch([query, pageSize], async () => {

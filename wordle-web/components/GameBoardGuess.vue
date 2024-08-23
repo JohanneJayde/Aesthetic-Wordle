@@ -13,7 +13,6 @@
 
 <script setup lang="ts">
 import { Word } from "~/scripts/word";
-import { defineProps } from "vue";
 
 const props = defineProps<{
   guess: Word;

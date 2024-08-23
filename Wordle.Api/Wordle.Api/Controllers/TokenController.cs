@@ -45,39 +45,30 @@ public class TokenController : ControllerBase
         bool results = await _userManager.CheckPasswordAsync(user, userCredentials.Password);
         if (results)
         {
-            // Set up our security key and our hashing algorithm
-            // PS we are storing our key in a pretty unsafe area... Do not store your JWT config key as plain text like this in production level applications\
-            // If someone gets this token secret they can generate tokens for themselves
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfiguration.Secret));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new List<Claim>
             {
-                new(JwtRegisteredClaimNames.Sub, user.UserName!),
+                new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new("userId", user.Id.ToString()),
                 new("userName", user.UserName!.ToString()),
-                new(Claims.BirthDate,user.Birthday.ToString())
             };
 
-            // Retrieve all roles associated with the user
             var roles = await _userManager.GetRolesAsync(user);
             var userClaims = await _userManager.GetClaimsAsync(user);
 
-            claims.AddRange(userClaims.Where( claim => claim.Type != null && claim.Value != null)
+            claims.AddRange(userClaims.Where(claim => claim.Type != null && claim.Value != null)
                 .Select(claim => new Claim(claim.Type, claim.Value)));
-            // Iterate over each role
             foreach (var role in roles)
             {
-                // Add a role claim to the claims list
                 claims.Add(new Claim(ClaimTypes.Role, role));
 
-                // Find the role object and retrieve all claims associated with it
                 var roleClaims = await _roleManager.GetClaimsAsync(
                     _roleManager.Roles.First(f => f.Name == role)
                 );
 
-                // Add each role-specific claim to the claims list
                 claims.AddRange(roleClaims
                     .Where(claim => claim.Type != null && claim.Value != null)
                     .Select(claim => new Claim(claim.Type, claim.Value))
@@ -95,8 +86,7 @@ public class TokenController : ControllerBase
 
             return Ok(new { token = jwtToken });
         }
-        return Unauthorized("The username or password is incorrect"); // When do we give info back to the user? Pros/Cons?
+        return Unauthorized("The username or password is incorrect");
     }
-
 }
 

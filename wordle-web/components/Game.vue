@@ -5,6 +5,7 @@
       color="primary"
       indeterminate
     />
+
     <v-sheet v-else color="transparent">
       <div
         v-if="isDaily"
@@ -38,29 +39,6 @@
         </v-col>
         <v-col lg="4" cols="1" v-if="$vuetify.display.mdAndUp" class="my-3">
           <v-row class="mb-1 justify-center">
-            <v-tooltip :text="playerName" location="bottom">
-              <template v-slot:activator="{ props }">
-                <v-sheet
-                  class="pa-2 cursor-pointer text-no-wrap"
-                  color="primary"
-                  rounded
-                  v-ripple
-                  width="200px"
-                  height="40px"
-                  elevation="4"
-                  v-bind="props"
-                  @click="showNameDialog = !showNameDialog"
-                  style="white-space: nowrap"
-                >
-                  <v-icon icon="mdi-account" />
-                  <strong>Username:</strong>
-                  {{ truncate(playerName, 8, "...") }}
-                </v-sheet>
-              </template>
-            </v-tooltip>
-          </v-row>
-
-          <v-row class="mb-1 justify-center">
             <v-sheet
               class="pa-2"
               color="primary"
@@ -85,7 +63,6 @@
               @click="showWordsList = !showWordsList"
             >
               <v-icon icon="mdi-book" />
-
               <strong> Words List:</strong> {{ validWordsNum }}
             </v-sheet>
           </v-row>
@@ -111,10 +88,6 @@
         v-model="itemSelect"
         grow
       >
-        <v-btn cols="5" value="showNameDialog">
-          <v-icon icon="mdi-account" />
-          {{ truncate(playerName, 8, "...") }}
-        </v-btn>
         <v-btn value="showWordsList">
           <v-icon icon="mdi-book" />
           {{ validWordsNum }}
@@ -139,7 +112,7 @@
             {{ gameMessage }}
           </v-card-title>
           <v-card-text v-if="game.gameState !== GameState.Playing" class="my-3">
-            The word was: <strong>{{ game.secretWord }}</strong>
+            The word was: <strong>{{ game.solution?.toUpperCase() }}</strong>
           </v-card-text>
           <v-card-text v-else class="my-3">
             You still have <strong>{{ 6 - game.guessIndex }}</strong> attempts
@@ -152,11 +125,7 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-      <NameDialog
-        @keyup.stop
-        v-model:show="showNameDialog"
-        v-model:name="playerName"
-      />
+
       <WordList @keyup.stop v-model="showWordsList" :wordsList="wordsList" />
     </v-sheet>
   </v-container>
@@ -185,16 +154,6 @@ import {
 } from "../scripts/soundUtils";
 import type { WordDto } from "~/Models/WordDto";
 
-const truncate = (text: string, length: number, clamp: string) => {
-  clamp = clamp || "...";
-  const node = document.createElement("div");
-  node.innerHTML = text;
-  const content = node.textContent || "";
-  return content.length > length
-    ? content.substring(0, length) + clamp
-    : content;
-};
-
 const props = withDefaults(
   defineProps<{
     isDaily: boolean;
@@ -209,8 +168,6 @@ const gameMessage = ref("");
 const gameStateColor = ref("");
 const showWordsList = ref(false);
 const isGameOver = ref(false);
-const playerName = ref("");
-const showNameDialog = ref(false);
 const itemSelect = ref("");
 const date = route.query.date?.toString();
 const volumne = ref(0.5);
@@ -234,40 +191,18 @@ function closeGameDialog() {
   stopwatch.value.start();
 }
 
-async function saveScore() {
-  let scoreUrl = "player/saveScore";
-  let data = {
-    name: playerName.value,
-    attempts: game.guessIndex + 1,
-    seconds: stopwatch.value.getCurrentTime(),
-  };
-  await Axios.post(scoreUrl, data, {
-    headers: { "Content-Type": "application/json" },
-  }).catch((err) => console.log(err));
-}
-
 const formattedDate = computed(() => {
   return dateUtils.getFormattedDateWithOrdianl(addDays(new Date(date!), 1));
 });
 
 watch(itemSelect, () => {
-  if (itemSelect.value === "showNameDialog") {
-    showNameDialog.value = true;
-  } else if (itemSelect.value === "showWordsList") {
+  if (itemSelect.value === "showWordsList") {
     showWordsList.value = true;
   } else if (itemSelect.value === "showResult") {
     isGameOver.value = true;
   }
 
   itemSelect.value = "";
-});
-
-watch(showNameDialog, () => {
-  if (playerName.value === "") {
-    playerName.value = "Guest";
-  } else {
-    nuxtStorage.localStorage.setData("name", playerName.value);
-  }
 });
 
 watch(
@@ -279,7 +214,6 @@ watch(
         gameStateColor.value = "win";
         playWinSound(volumne.value);
         stopwatch.value.stop();
-        saveScore();
         isGameOver.value = true;
         break;
 
@@ -300,10 +234,11 @@ watch(
   }
 );
 
-function handleClick(value: string) {
+async function handleClick(value: string) {
   if (value === "ENTER") {
     let currentGuessIndex = game.guessIndex;
-    game.submitGuess(playerName.value, stopwatch.value.getCurrentTime());
+    await game.submitGuess(stopwatch.value.getCurrentTime());
+
     if (currentGuessIndex !== game.guessIndex) {
       playEnterSound(volumne.value);
     }
@@ -317,11 +252,9 @@ function handleClick(value: string) {
 }
 
 onMounted(async () => {
-  const defaultName = await nuxtStorage.localStorage.getData("name");
   volumne.value =
     (await nuxtStorage.localStorage.getData("audioVolume")) ?? 0.5;
-  showNameDialog.value = defaultName === null || defaultName === "Guest";
-  playerName.value = showNameDialog.value ? "Guest" : defaultName;
+
   stopwatch.value.start();
 
   Axios.get("Word/FullWordsList")

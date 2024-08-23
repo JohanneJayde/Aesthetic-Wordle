@@ -7,51 +7,43 @@ public class GameService(AppDbContext db)
 {
     public AppDbContext Db { get; set; } = db;
 
-    public async Task<Game> PostGameResult(GameDto gameDto)
+    public async Task<GameResponseDto> PostGameResult(AppUser user, Word word, GameDto gameDto)
     {
-        // Get todays date
         var today = DateOnly.FromDateTime(DateTime.UtcNow);
 
-        // Get all the words that match our game word and load their WOTDs
-        var word = Db.Words
-        .Include(word => word.WordsOfTheDays)
-            .Where(word => word.Text == gameDto.Word)
-            .First();
-
-        // Create a new game object to save to the DB
         Game game = new()
         {
             Attempts = gameDto.Attempts,
             IsWin = gameDto.IsWin,
-            // Attempt to find the WOTD that best matches todays date
             WordOfTheDay = word.WordsOfTheDays
                 .OrderByDescending(wotd => wotd.Date)
                 .FirstOrDefault(wotd => wotd.Date <= today),
             Word = word,
             Seconds = gameDto.Seconds,
-            Name = gameDto.Name,
+            AppUser = user,
         };
 
         Db.Games.Add(game);
+
+        user.GameCount++;
+
+        user.AverageAttempts = ((user.AverageAttempts * (user.GameCount - 1)) + gameDto.Attempts) / user.GameCount;
+        user.AverageSecondsPerGame = ((user.AverageSecondsPerGame * (user.GameCount - 1)) + gameDto.Seconds) / user.GameCount;
+
         await Db.SaveChangesAsync();
-        return game;
-    }
 
-    public async Task<GameStatsDto> GetGameStats(Game game)
-    {
-        var gamesForWord = Db.Games.Where(g => g.WordId == game.WordId);
-
-        GameStatsDto stats = new()
+        GameResponseDto gameResponseDto = new()
         {
-            Word = game.Word!.Text,
-            AverageGuesses = await gamesForWord.AverageAsync(g => g.Attempts),
-            TotalTimesPlayed = await gamesForWord.CountAsync(),
-            AverageSeconds = await gamesForWord.AverageAsync(g => g.Seconds),
-            TotalWins = await gamesForWord.CountAsync(g => g.IsWin),
-            Usernames = [.. gamesForWord.Select(g => g.Name).Where(name => !string.IsNullOrEmpty(name))]
+            Id = game.GameId,
+            Attempts = game.Attempts,
+            Seconds = game.Seconds,
+            IsWin = game.IsWin,
+            DateAttempted = game.DateAttempted,
+            AppUserId = game.AppUserId,
+            WordId = game.WordId,
         };
 
-        return stats;
+        return gameResponseDto;
     }
 
     public IQueryable<AllWordStats> StatsForAllWords()
@@ -74,38 +66,34 @@ public class GameService(AppDbContext db)
 
         WordOfTheDay? word = await Db.WordsOfTheDays
             .Include(wotd => wotd.Games)
+                .ThenInclude(game => game.AppUser)
             .FirstOrDefaultAsync(wotd => wotd.Date == dateOnly);
 
-        IEnumerable<Game> wordOfTheDayGames;
-        GameStatsDto stats;
+        GameStatsDto stats = stats = new()
+        {
+            Date = dateOnly,
+            AverageGuesses = 0,
+            TotalTimesPlayed = 0,
+            TotalWins = 0,
+            AverageSeconds = 0,
+            Users = []
+        };
 
         if (word is not null && word.Games.Count != 0)
         {
-            wordOfTheDayGames = word.Games;
-
-            stats = new()
-            {
-                Date = word!.Date,
-                AverageGuesses = wordOfTheDayGames.Average(g => g.Attempts),
-                TotalTimesPlayed = wordOfTheDayGames.Count(),
-                TotalWins = wordOfTheDayGames.Count(g => g.IsWin),
-                AverageSeconds = wordOfTheDayGames.Average(w => w.Seconds),
-                Usernames = [.. wordOfTheDayGames.Select(g => g.Name).Where(name => !string.IsNullOrEmpty(name))]
-
-            };
-
-        }
-        else
-        {
-            stats = new()
-            {
-                Date = dateOnly,
-                AverageGuesses = 0,
-                TotalTimesPlayed = 0,
-                TotalWins = 0,
-                AverageSeconds = 0,
-                Usernames = []
-            };
+            stats.Date = word!.Date;
+            stats.AverageGuesses = word.Games.Average(g => g.Attempts);
+            stats.TotalTimesPlayed = word.Games.Count;
+            stats.TotalWins = word.Games.Count(g => g.IsWin);
+            stats.AverageSeconds = word.Games.Average(w => w.Seconds);
+            stats.Users = word.Games.Where(g => g.AppUser != null)
+                            .GroupBy(g => g.AppUser!.Id)
+                            .Select(group => group.First().AppUser)
+                            .Select(user => new AppUserDto()
+                            {
+                                UserName = user!.UserName!,
+                                Id = user!.Id,
+                            }).ToList();
         }
 
         return stats;
@@ -117,11 +105,64 @@ public class GameService(AppDbContext db)
 
         List<GameStatsDto> wordOfTheDayGames = []; ;
 
-        for(int i = 0; i < 10; i++)
+        for (int i = 0; i < 10; i++)
         {
             wordOfTheDayGames.Add(await WordOfDayStats(date.AddDays(-i)));
         }
         return wordOfTheDayGames;
+    }
+
+    public GameStateDto ValidateGuess(string guess, int attemptNumber, Word word)
+    {
+        var guessedWord = guess.Select(letter => new GuessedLetterState()
+        {
+            Letter = char.ToLower(letter),
+            State = LetterState.Unknown
+
+        }).ToArray();
+
+        string wordToGuess = word.Text.ToLower();
+
+        Dictionary<char, int> letterCounts = wordToGuess
+            .GroupBy(letter => letter)
+            .ToDictionary(group => group.Key, group => group.Count());
+
+        for (int i = 0; i < guessedWord.Length; i++)
+        {
+            if (guessedWord[i].Letter == wordToGuess[i])
+            {
+                letterCounts[guessedWord[i].Letter]--;
+                guessedWord[i].State = LetterState.Correct;
+            }
+        }
+
+        foreach (var letterState in guessedWord)
+        {
+            if (letterState.State == LetterState.Unknown)
+            {
+                foreach (char letter in wordToGuess)
+                {
+                    if (letterState.Letter == letter && letterCounts[letter] > 0)
+                    {
+                        letterState.State = LetterState.Misplaced;
+                        letterCounts[letter]--;
+                    }
+                }
+                if (letterState.State == LetterState.Unknown)
+                {
+                    letterState.State = LetterState.Wrong;
+                }
+            }
+        }
+
+        bool isWin = guessedWord.All(gs => gs.State == LetterState.Correct);
+
+        return new GameStateDto()
+        {
+            LetterStates = guessedWord.Select(ls => ls.State).ToList(),
+            IsWin = isWin,
+            Solution = isWin || attemptNumber == 6 ? wordToGuess : null,
+        };
     }
 
     public class AllWordStats()
@@ -129,5 +170,11 @@ public class GameService(AppDbContext db)
         public required string Word { get; set; }
 
         public double AverageGuesses { get; set; }
+    }
+
+    public class GuessedLetterState()
+    {
+        public char Letter { get; set; }
+        public LetterState State { get; set; }
     }
 }

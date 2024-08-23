@@ -10,11 +10,10 @@
       width="75%"
     />
     <div v-else>
-      <div class="text-h3 ma-5 font-weight-bold text-primary">
-        Last Ten Wordles
+      <div class="text-h4 my-5 font-weight-bold text-primary">
+        Lastest Wordles
       </div>
-      <v-spacer />
-      <v-row cols="12">
+      <v-row>
         <v-col
           v-for="(gameStat, i) in gameStats"
           :key="i"
@@ -22,6 +21,7 @@
           sm="12"
           md="6"
           lg="4"
+          xl="3"
         >
           <WordleStatsCard
             :gameStat="gameStat"
@@ -44,8 +44,7 @@ const isDailyWordlesLoading = ref(true);
 const date = ref("");
 
 useHead({
-  title: "Last Ten Wordles",
-  meta: [{ name: "description", content: "Cool site!" }],
+  title: "Lastest Wordles | Aesthetic Wordle",
 });
 
 const gameStats = ref<GameStats[]>([]);
@@ -64,7 +63,7 @@ onMounted(() => {
         date: data.date,
         word: data.word,
         averageGuesses: data.averageGuesses,
-        usernames: data.usernames,
+        users: data.users,
       }))
     )
     .then((gameStatData: GameStats[]) => {

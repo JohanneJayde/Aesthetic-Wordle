@@ -10,6 +10,6 @@ public class AppUser : IdentityUser
 
     public int AverageSecondsPerGame { get; set; }
 
-    public DateTime Birthday { get; set; }
+    public ICollection<Game> Games { get; set; } = new List<Game>();
 }
 

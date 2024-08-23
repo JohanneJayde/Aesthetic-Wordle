@@ -7,8 +7,6 @@ public class GameDto
 
     public bool IsWin { get; set; }
 
-    public required string Word {  get; set; }
-
-    public string Name { get; set; } = null!;
+    public int WordId { get; set; }
 }
 
