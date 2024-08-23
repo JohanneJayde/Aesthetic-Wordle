@@ -9,7 +9,6 @@
           {{ message }}
         </slot>
       </v-card-text>
-
       <v-card-actions class="mx-auto">
         <v-btn
           :prepend-icon="actionIcon"

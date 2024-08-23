@@ -264,6 +264,8 @@ async function handleClick(value: string) {
 
     if (wasGuessSubmitted) {
       playEnterSound(volumne.value);
+    } else {
+      game.guess.clear();
     }
   } else if (value === "👈" || value === "BACKSPACE") {
     playClickSound(volumne.value);
@@ -277,16 +279,17 @@ async function handleClick(value: string) {
 async function submitGuess(): Promise<boolean> {
   if (game.gameState != GameState.Playing) return false;
 
-  let currentGuessIndex = game.guessIndex;
-
   const state = await GameService.validateGuess(
     game.guess.word,
     game.guessIndex + 1,
     wordId
   );
+
+  if (state.letterStates.length === 0) return false;
+
   game.submitGuess(state);
 
-  return currentGuessIndex !== game.guessIndex;
+  return true;
 }
 
 onMounted(async () => {

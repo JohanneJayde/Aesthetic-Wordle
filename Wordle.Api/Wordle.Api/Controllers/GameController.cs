@@ -51,14 +51,22 @@ public class GameController(GameService gameService, WordOfTheDayService wordofT
     {
         if (string.IsNullOrEmpty(guess.Guess) || guess.Guess.Length != 5)
         {
-            return BadRequest("Invalid guess format, must be a word of length 5.");
+            return Ok(new GameStateDto()
+            {
+                IsWin = false,
+                LetterStates = []
+            });
         }
 
         bool isValid = await WordOfTheDayService.Exists(guess.Guess);
 
         if (!isValid)
         {
-            return BadRequest("Word is not valid within Words List");
+            return Ok(new GameStateDto()
+            {
+                IsWin = false,
+                LetterStates = []
+            });
         }
 
         Word? word = await WordOfTheDayService.GetWord(guess.WordId);
@@ -80,7 +88,7 @@ public class GameController(GameService gameService, WordOfTheDayService wordofT
     {
         if(string.IsNullOrEmpty(wordToValidate) || wordToValidate.Length > 5)
         {
-            return BadRequest("Invalid Guess format, must be word of length 5.");
+            return Ok(false);
         }
 
         bool isValid = await WordOfTheDayService.Exists(wordToValidate);
