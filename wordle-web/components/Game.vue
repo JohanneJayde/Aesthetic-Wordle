@@ -5,13 +5,13 @@
       color="primary"
       indeterminate
     />
-
-    <v-sheet v-else color="transparent">
+    <div v-else>
       <div
         v-if="isDaily"
         class="font-text text-primary text-center text-wrap font-weight-bold mb-3"
       >
-        Daily Wordle: {{ formattedDate }}
+        Daily Wordle:
+        {{ dateUtils.getFormattedDateWithOrdianl(addDays(new Date(date!), 1)) }}
       </div>
       <div
         v-else
@@ -101,33 +101,27 @@
 
       <Keyboard @keyup="handleClick" />
 
-      <v-dialog v-model="isGameOver" class="mx-auto" max-width="500">
-        <v-card
-          :color="gameStateColor"
-          tile
-          class="pa-5 text-center text-white"
-          rounded
-        >
-          <v-card-title class="text-h5 text-wrap">
-            {{ gameMessage }}
-          </v-card-title>
-          <v-card-text v-if="game.gameState !== GameState.Playing" class="my-3">
+      <PopUpDialog
+        v-model="isGameOver"
+        :title="gameMessage"
+        :color="gameStateColor"
+        action="Restart"
+        actionIcon="mdi-restart"
+        @closePopUp="restartGame"
+      >
+        <template #content>
+          <span v-if="game.gameState !== GameState.Playing">
             The word was: <strong>{{ game.solution?.toUpperCase() }}</strong>
-          </v-card-text>
-          <v-card-text v-else class="my-3">
+          </span>
+          <span v-else>
             You still have <strong>{{ 6 - game.guessIndex }}</strong> attempts
             left..
-          </v-card-text>
-          <v-card-actions class="mx-auto">
-            <v-btn variant="outlined" @click="closeGameDialog">
-              <v-icon size="large" class="mr-2"> mdi-restart </v-icon> Restart
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+          </span>
+        </template>
+      </PopUpDialog>
 
       <WordList @keyup.stop v-model="showWordsList" :wordsList="wordsList" />
-    </v-sheet>
+    </div>
   </v-container>
 </template>
 
@@ -153,6 +147,7 @@ import {
   playWinSound,
 } from "../scripts/soundUtils";
 import type { WordDto } from "~/Models/WordDto";
+import { WordService, GameService, TokenService } from "@/services";
 
 const props = withDefaults(
   defineProps<{
@@ -164,36 +159,60 @@ const props = withDefaults(
 );
 
 const route = useRoute();
-const gameMessage = ref("");
-const gameStateColor = ref("");
 const showWordsList = ref(false);
 const isGameOver = ref(false);
 const itemSelect = ref("");
 const date = route.query.date?.toString();
 const volumne = ref(0.5);
 const wordsList = ref<string[]>([]);
+const tokenService = new TokenService();
+const wordId = await getWordId();
 
 const game = reactive(new Game());
 const validWordsNum = computed(() => game.filterValidWords().length);
 provide("GAME", game);
-const stopwatch = ref(new Stopwatch());
+const stopwatch = reactive(new Stopwatch());
 
-const option = ref<string | null>();
-
-game.startNewGame(date);
-
-function closeGameDialog() {
-  isGameOver.value = false;
-  setTimeout(() => {
-    game.startNewGame(date);
-  }, 300);
-  stopwatch.value.reset();
-  stopwatch.value.start();
-}
-
-const formattedDate = computed(() => {
-  return dateUtils.getFormattedDateWithOrdianl(addDays(new Date(date!), 1));
+const gameMessage = computed(() => {
+  switch (game.gameState) {
+    case GameState.Won:
+      return "Congratulations! You won! 🥳";
+    case GameState.Lost:
+      return "You lost! Better luck next time! 😭";
+    default:
+      return "Giving up already? 🤔";
+  }
 });
+
+const gameStateColor = computed(() => {
+  switch (game.gameState) {
+    case GameState.Won:
+      return "win";
+    case GameState.Lost:
+      return "lose";
+    default:
+      return "info";
+  }
+});
+
+watch(
+  () => game.gameState,
+  (newState) => {
+    switch (newState) {
+      case GameState.Won:
+        playWinSound(volumne.value);
+        stopGame();
+        break;
+      case GameState.Lost:
+        playLoseSound(volumne.value);
+        stopGame();
+        break;
+      case GameState.Playing:
+        isGameOver.value = false;
+        break;
+    }
+  }
+);
 
 watch(itemSelect, () => {
   if (itemSelect.value === "showWordsList") {
@@ -205,41 +224,47 @@ watch(itemSelect, () => {
   itemSelect.value = "";
 });
 
-watch(
-  () => game.gameState,
-  (newState) => {
-    switch (newState) {
-      case GameState.Won:
-        gameMessage.value = "Congratulations! You won! 🥳";
-        gameStateColor.value = "win";
-        playWinSound(volumne.value);
-        stopwatch.value.stop();
-        isGameOver.value = true;
-        break;
-
-      case GameState.Lost:
-        gameMessage.value = "You lost! Better luck next time! 😭";
-        gameStateColor.value = "lose";
-        playLoseSound(volumne.value);
-        stopwatch.value.stop();
-        isGameOver.value = true;
-        break;
-
-      case GameState.Playing:
-        gameMessage.value = "Giving up already? 🤔";
-        gameStateColor.value = "play";
-        isGameOver.value = false;
-        break;
-    }
+async function getWordId() {
+  if (props.isDaily) {
+    return await WordService.getWordOfTheDayFromApi(date!);
+  } else {
+    return await WordService.getRadnomWordFromApi();
   }
-);
+}
+
+async function stopGame() {
+  stopwatch.stop();
+  isGameOver.value = true;
+
+  if (tokenService.isLoggedIn()) {
+    await submitGameResults();
+  }
+}
+
+async function submitGameResults() {
+  await GameService.submitGame(
+    game.guessIndex,
+    wordId,
+    game.gameState === GameState.Won,
+    stopwatch.getCurrentTime(),
+    tokenService.getToken()
+  );
+}
+
+function restartGame() {
+  isGameOver.value = false;
+  setTimeout(() => {
+    game.startNewGame(wordsList.value);
+  }, 300);
+  stopwatch.reset();
+  stopwatch.start();
+}
 
 async function handleClick(value: string) {
   if (value === "ENTER") {
-    let currentGuessIndex = game.guessIndex;
-    await game.submitGuess(stopwatch.value.getCurrentTime());
+    const wasGuessSubmitted = await submitGuess();
 
-    if (currentGuessIndex !== game.guessIndex) {
+    if (wasGuessSubmitted && game.gameState === GameState.Playing) {
       playEnterSound(volumne.value);
     }
   } else if (value === "👈" || value === "BACKSPACE") {
@@ -251,11 +276,31 @@ async function handleClick(value: string) {
   }
 }
 
+async function submitGuess(): Promise<boolean> {
+  if (game.gameState != GameState.Playing) return false;
+
+  const state = await GameService.validateGuess(
+    game.guess.word,
+    game.guessIndex + 1,
+    wordId
+  );
+
+  if (state.letterStates.length === 0) {
+    game.guess.clear();
+
+    return false;
+  }
+
+  game.submitGuess(state);
+
+  return true;
+}
+
 onMounted(async () => {
   volumne.value =
     (await nuxtStorage.localStorage.getData("audioVolume")) ?? 0.5;
 
-  stopwatch.value.start();
+  stopwatch.start();
 
   Axios.get("Word/FullWordsList")
     .then((res) => res.data)
@@ -263,12 +308,7 @@ onMounted(async () => {
       wordsList.value = data.items.map((word: WordDto) =>
         word.word.toLowerCase()
       );
-      game.setWordsList(wordsList.value);
+      game.startNewGame(wordsList.value);
     });
-  if (props.isDaily) {
-    option.value = date;
-  } else {
-    option.value = null;
-  }
 });
 </script>

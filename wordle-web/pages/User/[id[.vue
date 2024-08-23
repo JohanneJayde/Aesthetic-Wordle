@@ -48,19 +48,9 @@
                   color="win"
                   class="mx-auto font-weight-bold d-flex justify-center align-center"
                   size="100"
-                  :model-value="
-                    (userData.games.filter((g) => g.isWin).length /
-                      userData.gameCount) *
-                    100
-                  "
+                  :model-value="userWinPerceptage"
                 >
-                  {{
-                    (
-                      (userData.games.filter((g) => g.isWin).length /
-                        userData.gameCount) *
-                      100
-                    ).toFixed(2)
-                  }}%</v-progress-circular
+                  {{ userWinPerceptage }}%</v-progress-circular
                 >
               </v-card-item>
             </v-card>
@@ -69,7 +59,7 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col>
+      <v-col v-if="userData.gameCount > 0">
         <v-table>
           <thead>
             <tr class="bg-primary">
@@ -94,6 +84,9 @@
           </tbody>
         </v-table>
       </v-col>
+      <v-col v-else>
+        <v-alert type="info" color="primary"> No games played yet. </v-alert>
+      </v-col>
     </v-row>
   </v-container>
 </template>
@@ -109,6 +102,15 @@ const userId = route.params.id;
 function ordinalDate(date: string): string {
   return dateUtils.getFormattedDateWithOrdianl(new Date(date));
 }
+
+const userWinPerceptage = computed(() => {
+  return userData.gameCount === 0
+    ? 0.0
+    : (
+        (userData.games.filter((g) => g.isWin).length / userData.gameCount) *
+        100
+      ).toFixed(2);
+});
 
 const res = await Axios.get("/User/Get?userId=" + userId);
 

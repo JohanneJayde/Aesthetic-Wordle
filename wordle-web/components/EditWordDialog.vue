@@ -68,7 +68,7 @@
 <script setup lang="ts">
 import type { WordDto } from "~/Models/WordDto";
 import Axios from "axios";
-import TokenService from "~/scripts/tokenService";
+import { TokenService } from "@/services";
 
 const props = withDefaults(
   defineProps<{ isAdd: boolean; word?: WordDto | undefined }>(),
