@@ -13,7 +13,6 @@
       <div class="text-h3 ma-5 font-weight-bold text-primary">
         Last Ten Wordles
       </div>
-      <v-spacer />
       <v-row cols="12">
         <v-col
           v-for="(gameStat, i) in gameStats"
@@ -52,7 +51,6 @@ const gameStats = ref<GameStats[]>([]);
 
 onMounted(() => {
   const formatDate = format(new Date(), "MM-dd-yyyy");
-  console.log(formatDate);
   date.value = formatDate;
   Axios.get("game/LastTenWordOfTheDayStats/" + formatDate)
     .then((res: { data: any }) => res.data)
@@ -65,7 +63,7 @@ onMounted(() => {
         date: data.date,
         word: data.word,
         averageGuesses: data.averageGuesses,
-        usernames: data.usernames,
+        users: data.users,
       }))
     )
     .then((gameStatData: GameStats[]) => {

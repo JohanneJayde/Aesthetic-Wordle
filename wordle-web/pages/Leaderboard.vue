@@ -72,7 +72,10 @@
                 style="position: sticky; left: 50px"
                 class="text-center bg-surface"
               >
-                <router-link :to="'/User/' + player.userId">
+                <router-link
+                  :to="'/User/' + player.userId"
+                  class="text-decoration-none text-primary"
+                >
                   {{ player.userName }}
                 </router-link>
               </td>
