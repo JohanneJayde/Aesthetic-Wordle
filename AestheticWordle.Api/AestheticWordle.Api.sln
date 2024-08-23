@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34701.34
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AestheticWordle.Api", "AestheticWordle.Api\AestheticWordle.Api.csproj", "{6494B1D9-AE62-4D25-9C95-032D3672047D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AestheticWordle.Api.Tests", "AestheticWordle.Api.Tests\AestheticWordle.Api.Tests.csproj", "{DF8C3EA2-96D3-475C-ACE3-4D6C5AAE7CA3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6494B1D9-AE62-4D25-9C95-032D3672047D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6494B1D9-AE62-4D25-9C95-032D3672047D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6494B1D9-AE62-4D25-9C95-032D3672047D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6494B1D9-AE62-4D25-9C95-032D3672047D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DF8C3EA2-96D3-475C-ACE3-4D6C5AAE7CA3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DF8C3EA2-96D3-475C-ACE3-4D6C5AAE7CA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DF8C3EA2-96D3-475C-ACE3-4D6C5AAE7CA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DF8C3EA2-96D3-475C-ACE3-4D6C5AAE7CA3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E8DEB657-BBF8-4653-991C-64A5DB0EBDB0}
+	EndGlobalSection
+EndGlobal
