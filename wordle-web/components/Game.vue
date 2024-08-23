@@ -5,12 +5,13 @@
       color="primary"
       indeterminate
     />
-    <v-sheet v-else color="transparent">
+    <div v-else>
       <div
         v-if="isDaily"
         class="font-text text-primary text-center text-wrap font-weight-bold mb-3"
       >
-        Daily Wordle: {{ formattedDate }}
+        Daily Wordle:
+        {{ dateUtils.getFormattedDateWithOrdianl(addDays(new Date(date!), 1)) }}
       </div>
       <div
         v-else
@@ -120,7 +121,7 @@
       </PopUpDialog>
 
       <WordList @keyup.stop v-model="showWordsList" :wordsList="wordsList" />
-    </v-sheet>
+    </div>
   </v-container>
 </template>
 
@@ -170,7 +171,7 @@ const wordId = await getWordId();
 const game = reactive(new Game());
 const validWordsNum = computed(() => game.filterValidWords().length);
 provide("GAME", game);
-const stopwatch = ref(new Stopwatch());
+const stopwatch = reactive(new Stopwatch());
 
 const gameMessage = computed(() => {
   switch (game.gameState) {
@@ -232,18 +233,22 @@ async function getWordId() {
 }
 
 async function stopGame() {
-  stopwatch.value.stop();
+  stopwatch.stop();
   isGameOver.value = true;
 
   if (tokenService.isLoggedIn()) {
-    await GameService.submitGame(
-      game.guessIndex,
-      wordId,
-      game.gameState === GameState.Won,
-      stopwatch.value.getCurrentTime(),
-      tokenService.getToken()
-    );
+    await submitGameResults();
   }
+}
+
+async function submitGameResults() {
+  await GameService.submitGame(
+    game.guessIndex,
+    wordId,
+    game.gameState === GameState.Won,
+    stopwatch.getCurrentTime(),
+    tokenService.getToken()
+  );
 }
 
 function restartGame() {
@@ -251,13 +256,9 @@ function restartGame() {
   setTimeout(() => {
     game.startNewGame(wordsList.value);
   }, 300);
-  stopwatch.value.reset();
-  stopwatch.value.start();
+  stopwatch.reset();
+  stopwatch.start();
 }
-
-const formattedDate = computed(() => {
-  return dateUtils.getFormattedDateWithOrdianl(addDays(new Date(date!), 1));
-});
 
 async function handleClick(value: string) {
   if (value === "ENTER") {
@@ -265,8 +266,6 @@ async function handleClick(value: string) {
 
     if (wasGuessSubmitted && game.gameState === GameState.Playing) {
       playEnterSound(volumne.value);
-    } else {
-      game.guess.clear();
     }
   } else if (value === "👈" || value === "BACKSPACE") {
     playClickSound(volumne.value);
@@ -286,7 +285,11 @@ async function submitGuess(): Promise<boolean> {
     wordId
   );
 
-  if (state.letterStates.length === 0) return false;
+  if (state.letterStates.length === 0) {
+    game.guess.clear();
+
+    return false;
+  }
 
   game.submitGuess(state);
 
@@ -297,7 +300,7 @@ onMounted(async () => {
   volumne.value =
     (await nuxtStorage.localStorage.getData("audioVolume")) ?? 0.5;
 
-  stopwatch.value.start();
+  stopwatch.start();
 
   Axios.get("Word/FullWordsList")
     .then((res) => res.data)
