@@ -45,7 +45,7 @@ const keyboardLetterRows = computed(() => {
     let keyboardLetterRow: Letter[] = [];
     for (let key of keyboardRow) {
       keyboardLetterRow.push(
-        game.guessedLetters.find((letter) => letter.char === key) ??
+        game?.guessedLetters.find((letter) => letter.char === key) ??
           new Letter(key)
       );
     }

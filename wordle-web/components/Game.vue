@@ -101,30 +101,24 @@
 
       <Keyboard @keyup="handleClick" />
 
-      <v-dialog v-model="isGameOver" class="mx-auto" max-width="500">
-        <v-card
-          :color="gameStateColor"
-          tile
-          class="pa-5 text-center text-white"
-          rounded
-        >
-          <v-card-title class="text-h5 text-wrap">
-            {{ gameMessage }}
-          </v-card-title>
-          <v-card-text v-if="game.gameState !== GameState.Playing" class="my-3">
+      <PopUpDialog
+        v-model="isGameOver"
+        :title="gameMessage"
+        :color="gameStateColor"
+        action="Restart"
+        actionIcon="mdi-restart"
+        @closePopUp="closeGameDialog()"
+      >
+        <template #content>
+          <span v-if="game.gameState !== GameState.Playing">
             The word was: <strong>{{ game.solution?.toUpperCase() }}</strong>
-          </v-card-text>
-          <v-card-text v-else class="my-3">
+          </span>
+          <span v-else>
             You still have <strong>{{ 6 - game.guessIndex }}</strong> attempts
             left..
-          </v-card-text>
-          <v-card-actions class="mx-auto">
-            <v-btn variant="outlined" @click="closeGameDialog">
-              <v-icon size="large" class="mr-2"> mdi-restart </v-icon> Restart
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+          </span>
+        </template>
+      </PopUpDialog>
 
       <WordList @keyup.stop v-model="showWordsList" :wordsList="wordsList" />
     </v-sheet>
@@ -167,8 +161,6 @@ const props = withDefaults(
 );
 
 const route = useRoute();
-const gameMessage = ref("");
-const gameStateColor = ref("");
 const showWordsList = ref(false);
 const isGameOver = ref(false);
 const itemSelect = ref("");
@@ -176,26 +168,14 @@ const date = route.query.date?.toString();
 const volumne = ref(0.5);
 const wordsList = ref<string[]>([]);
 const tokenService = new TokenService();
-
 const wordId = await getWordId();
-
-function getWordId() {
-  if (props.isDaily) {
-    return WordService.getWordOfTheDayFromApi(date!);
-  } else {
-    return WordService.getRadnomWordFromApi();
-  }
-}
 
 const game = reactive(new Game());
 const validWordsNum = computed(() => game.filterValidWords().length);
 provide("GAME", game);
 const stopwatch = ref(new Stopwatch());
 
-const option = ref<string | null>();
-
 function closeGameDialog() {
-  isGameOver.value = false;
   setTimeout(() => {
     game.startNewGame(wordId, wordsList.value);
   }, 300);
@@ -217,62 +197,75 @@ watch(itemSelect, () => {
   itemSelect.value = "";
 });
 
+const gameMessage = computed(() => {
+  switch (game.gameState) {
+    case GameState.Won:
+      return "Congratulations! You won! 🥳";
+    case GameState.Lost:
+      return "You lost! Better luck next time! 😭";
+    default:
+      return "Giving up already? 🤔";
+  }
+});
+
+const gameStateColor = computed(() => {
+  switch (game.gameState) {
+    case GameState.Won:
+      return "win";
+    case GameState.Lost:
+      return "lose";
+    default:
+      return "info";
+  }
+});
+
 watch(
   () => game.gameState,
   (newState) => {
     switch (newState) {
       case GameState.Won:
-        gameMessage.value = "Congratulations! You won! 🥳";
-        gameStateColor.value = "win";
         playWinSound(volumne.value);
-        stopwatch.value.stop();
-        isGameOver.value = true;
-
-        if (tokenService.isLoggedIn()) {
-          GameService.submitGame(
-            game.guessIndex + 1,
-            wordId,
-            game.gameState === GameState.Won,
-            stopwatch.value.getCurrentTime(),
-            tokenService.getToken()
-          );
-        }
-
+        stopGame();
         break;
-
       case GameState.Lost:
-        gameMessage.value = "You lost! Better luck next time! 😭";
-        gameStateColor.value = "lose";
         playLoseSound(volumne.value);
-        stopwatch.value.stop();
-        isGameOver.value = true;
-
-        if (tokenService.isLoggedIn()) {
-          GameService.submitGame(
-            game.guessIndex + 1,
-            wordId,
-            game.gameState === GameState.Won,
-            stopwatch.value.getCurrentTime(),
-            tokenService.getToken()
-          );
-        }
+        stopGame();
         break;
-
       case GameState.Playing:
-        gameMessage.value = "Giving up already? 🤔";
-        gameStateColor.value = "play";
         isGameOver.value = false;
         break;
     }
   }
 );
 
+async function getWordId() {
+  if (props.isDaily) {
+    return await WordService.getWordOfTheDayFromApi(date!);
+  } else {
+    return await WordService.getRadnomWordFromApi();
+  }
+}
+
+async function stopGame() {
+  stopwatch.value.stop();
+  isGameOver.value = true;
+
+  if (tokenService.isLoggedIn()) {
+    await GameService.submitGame(
+      game.guessIndex + 1,
+      wordId,
+      game.gameState === GameState.Won,
+      stopwatch.value.getCurrentTime(),
+      tokenService.getToken()
+    );
+  }
+}
+
 async function handleClick(value: string) {
   if (value === "ENTER") {
-    let currentGuessIndex = game.guessIndex;
-    await game.submitGuess();
+    const wasGuessSubmitted = await submitGuess();
 
-    if (currentGuessIndex !== game.guessIndex) {
+    if (wasGuessSubmitted) {
       playEnterSound(volumne.value);
     }
   } else if (value === "👈" || value === "BACKSPACE") {
@@ -282,6 +275,21 @@ async function handleClick(value: string) {
     playClickSound(volumne.value);
     game.addLetter(value);
   }
+}
+
+async function submitGuess(): Promise<boolean> {
+  if (game.gameState != GameState.Playing) return false;
+
+  let currentGuessIndex = game.guessIndex;
+
+  const state = await GameService.validateGuess(
+    game.guess.word,
+    game.guessIndex + 1,
+    wordId
+  );
+  game.submitGuess(state);
+
+  return currentGuessIndex !== game.guessIndex;
 }
 
 onMounted(async () => {
@@ -298,11 +306,5 @@ onMounted(async () => {
       );
       game.startNewGame(wordId, wordsList.value);
     });
-
-  if (props.isDaily) {
-    option.value = date;
-  } else {
-    option.value = null;
-  }
 });
 </script>

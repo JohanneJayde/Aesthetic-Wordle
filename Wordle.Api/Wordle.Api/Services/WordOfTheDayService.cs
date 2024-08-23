@@ -81,6 +81,14 @@ public class WordOfTheDayService(AppDbContext Db)
 
     }
 
+    public async Task<bool> Exists(string word){
+
+        Word? validWord = await Db.Words.FirstOrDefaultAsync(w => w.Text == word);
+
+        return validWord is not null;
+
+    }
+
     #region WordList
     public static List<string> WordList()
     {

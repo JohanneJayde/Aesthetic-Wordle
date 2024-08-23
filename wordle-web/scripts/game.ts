@@ -1,7 +1,6 @@
 import { LetterState, type Letter } from "./letter";
 import { Word } from "./word";
 import type { GameStateDto } from "~/Models/GameStateDto";
-import GameService from "~/Services/GameService";
 
 export class Game {
   public maxAttempts: number;
@@ -9,7 +8,6 @@ export class Game {
   public guessIndex: number = 0;
   public gameState: GameState = GameState.Playing;
   public guessedLetters: Letter[] = [];
-  private secretWordId: number = -1;
   private _solution: string | null = null;
   public wordsList: string[] = [];
 
@@ -77,19 +75,7 @@ export class Game {
     }
   }
 
-  public async submitGuess() {
-    if (this.gameState !== GameState.Playing) return;
-    if (!this.guess.isFilled) return;
-    if (!this.isValidWord(this.guess)) {
-      this.guess.clear();
-      return;
-    }
-    const state: GameStateDto = await this.validateGuess(
-      this.guess.word,
-      this.guessIndex + 1,
-      this.secretWordId
-    );
-
+  public submitGuess(state: GameStateDto) {
     for (const [i, letter] of this.guess.letters.entries()) {
       letter.state = state.letterStates[i];
     }
@@ -109,14 +95,6 @@ export class Game {
         this.guessIndex++;
       }
     }
-  }
-
-  public async validateGuess(
-    guess: string,
-    attemptNumber: number,
-    wordId: number
-  ): Promise<GameStateDto> {
-    return await GameService.validateGuess(guess, attemptNumber, wordId);
   }
 
   public isValidWord(word: Word): boolean {

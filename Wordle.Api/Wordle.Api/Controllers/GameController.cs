@@ -45,18 +45,52 @@ public class GameController(GameService gameService, WordOfTheDayService wordofT
     [HttpPost("Guess")]
     [ProducesResponseType(typeof(GameStateDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
+
     public async Task<IActionResult> ValidateGuess(GuessDto guess)
     {
+        if (string.IsNullOrEmpty(guess.Guess) || guess.Guess.Length != 5)
+        {
+            return BadRequest("Invalid guess format, must be a word of length 5.");
+        }
+
+        bool isValid = await WordOfTheDayService.Exists(guess.Guess);
+
+        if (!isValid)
+        {
+            return BadRequest("Word is not valid within Words List");
+        }
+
         Word? word = await WordOfTheDayService.GetWord(guess.WordId);
 
         if (word is null)
         {
-            return BadRequest("Word not found");
+            return NotFound("Word not found");
         }
 
         var state = GameService.ValidateGuess(guess.Guess, guess.AttemptNumber, word);
 
         return Ok(state);
+    }
+
+    [HttpPost("ValidateWord")]
+    [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> IsValidWord(string wordToValidate)
+    {
+        if(string.IsNullOrEmpty(wordToValidate) || wordToValidate.Length > 5)
+        {
+            return BadRequest("Invalid Guess format, must be word of length 5.");
+        }
+
+        bool isValid = await WordOfTheDayService.Exists(wordToValidate);
+
+        if (!isValid)
+        {
+            return Ok(false);
+        }
+
+        return Ok(true);
     }
 
     [HttpGet("WordOfTheDayStats/{date}")]
