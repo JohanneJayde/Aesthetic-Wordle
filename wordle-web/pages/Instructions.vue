@@ -81,8 +81,7 @@ import { Letter, LetterState } from "~/scripts/letter";
 import { Word } from "~/scripts/word";
 
 useHead({
-  title: "How to Play",
-  meta: [{ name: "description", content: "Cool site!" }],
+  title: "How to Play | Aesthetic Wordle",
 });
 
 const exampleWord = new Word({ word: "BASED" });

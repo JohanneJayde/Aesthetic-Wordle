@@ -4,7 +4,6 @@
 
 <script setup lang="ts">
 useHead({
-  title: "Daily Wordle",
-  meta: [{ name: "description", content: "Cool site!" }],
+  title: "Daily Wordle | Aesthetic Wordle",
 });
 </script>

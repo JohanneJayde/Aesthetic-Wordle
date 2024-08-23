@@ -11,7 +11,7 @@
     />
     <div v-else>
       <div class="text-h4 my-5 font-weight-bold text-primary">
-        Last Ten Wordles
+        Lastest Wordles
       </div>
       <v-row>
         <v-col
@@ -44,8 +44,7 @@ const isDailyWordlesLoading = ref(true);
 const date = ref("");
 
 useHead({
-  title: "Last Ten Wordles",
-  meta: [{ name: "description", content: "Cool site!" }],
+  title: "Lastest Wordles | Aesthetic Wordle",
 });
 
 const gameStats = ref<GameStats[]>([]);

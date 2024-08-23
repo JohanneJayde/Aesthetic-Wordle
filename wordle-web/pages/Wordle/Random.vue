@@ -3,7 +3,6 @@
 </template>
 <script setup lang="ts">
 useHead({
-  title: "Random Wordle",
-  meta: [{ name: "description", content: "Cool site!" }],
+  title: "Random Wordle | Aesthetic Wordle",
 });
 </script>

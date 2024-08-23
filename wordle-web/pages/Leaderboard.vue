@@ -149,8 +149,7 @@ interface Player {
 }
 
 useHead({
-  title: "Leaderboard",
-  meta: [{ name: "description", content: "Cool site!" }],
+  title: "Leaderboard | Aesthetic Wordle",
 });
 
 const isLeaderboardLoading = ref(true);
