@@ -10,8 +10,26 @@ export default class TokenService {
   }
 
   public isLoggedIn(): boolean {
-    // Won't work if the token is expired
+    if (this.isExpired()) {
+      this.logout();
+      return false;
+    }
+
     return this.getToken() !== "";
+  }
+
+  public isExpired(): boolean {
+    const token = this.getToken();
+    if (token === "") {
+      return true;
+    }
+    const expiration = JSON.parse(atob(token.split(".")[1])).exp;
+    return Date.now() >= expiration * 1000;
+  }
+
+  public logout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
   }
 
   public getUserName() {

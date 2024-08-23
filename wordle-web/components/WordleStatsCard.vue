@@ -1,5 +1,5 @@
 <template>
-  <v-card elevation="5" class="h-100">
+  <v-card elevation="5">
     <v-sheet color="primary" class="py-2">
       <v-row>
         <v-col>
@@ -22,7 +22,7 @@
     </v-sheet>
     <v-card-item>
       <v-row>
-        <v-col xl="6" lg="12">
+        <v-col cols="6" lg="12" xl="5" md="12">
           <v-list density="compact">
             <v-list-item class="font-weight-bold"
               >Total Wins: {{ gameStat.totalWins }}</v-list-item
@@ -39,11 +39,9 @@
             >
           </v-list>
         </v-col>
-        <v-col class="d-flex gx-3" cols="6">
+        <v-col cols="6" class="d-flex" lg="12" xl="7" md="12">
           <v-col class="d-flex flex-column">
-            <span class="font-weight-bold text-center mb-2"
-              >Average Attempts</span
-            >
+            <span class="font-weight-bold text-center mb-2">Attempts</span>
             <v-progress-circular
               :rotate="360"
               :width="10"
@@ -56,9 +54,7 @@
             >
           </v-col>
           <v-col class="d-flex flex-column">
-            <span class="font-weight-bold text-center mb-2"
-              >Win Percentage</span
-            >
+            <span class="font-weight-bold text-center mb-2">Win %</span>
             <v-progress-circular
               :rotate="360"
               :width="10"
@@ -76,7 +72,7 @@
     <v-card-actions>
       <v-btn
         v-if="isDaily"
-        class="pa-2 px-5 mx-3 mb-4 bg-primary"
+        class="pa-2 ml-4 mb-3 bg-primary"
         color="white"
         :to="`/Wordle/Daily?date=${formattedDate}`"
         >Play Word</v-btn
@@ -89,11 +85,8 @@
 <script setup lang="ts">
 import { addDays } from "date-fns";
 import type { GameStats } from "~/Models/GameStas";
-import nuxtStorage from "nuxt-storage";
 import dateUtils from "~/scripts/dateUtils";
-import TokenService from "~/scripts/tokenService";
-
-const playerName = ref("");
+import TokenService from "~/scripts/TokenService";
 
 const props = withDefaults(
   defineProps<{
@@ -136,10 +129,5 @@ const hasPlayed = computed(() => {
   return props.gameStat.users.some(
     (user) => user.userName === tokenService.getUserName()
   );
-});
-
-onMounted(async () => {
-  const defaultName = nuxtStorage.localStorage.getData("name");
-  playerName.value = defaultName ? defaultName : "Guest";
 });
 </script>

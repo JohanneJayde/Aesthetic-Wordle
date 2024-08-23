@@ -1,6 +1,6 @@
 ﻿namespace Wordle.Api.Services;
 
-public class UserService
+public class UserService()
 {
 
 }

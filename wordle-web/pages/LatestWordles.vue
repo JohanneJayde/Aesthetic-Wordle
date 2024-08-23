@@ -13,7 +13,7 @@
       <div class="text-h3 ma-5 font-weight-bold text-primary">
         Last Ten Wordles
       </div>
-      <v-row cols="12">
+      <v-row>
         <v-col
           v-for="(gameStat, i) in gameStats"
           :key="i"
@@ -21,6 +21,7 @@
           sm="12"
           md="6"
           lg="4"
+          xl="4"
         >
           <WordleStatsCard
             :gameStat="gameStat"

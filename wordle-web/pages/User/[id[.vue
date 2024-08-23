@@ -1,7 +1,7 @@
 <template>Welcome {{ username }}</template>
 
 <script setup lang="ts">
-import TokenService from "~/scripts/tokenService";
+import TokenService from "~/scripts/TokenService";
 
 const tokenService = new TokenService();
 

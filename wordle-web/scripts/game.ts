@@ -2,7 +2,7 @@ import { LetterState, type Letter } from "./letter";
 import { Word } from "./word";
 import Axios from "axios";
 import type { GameStateDto } from "~/Models/GameStateDto";
-import TokenService from "./tokenService";
+import TokenService from "./TokenService";
 
 export class Game {
   public maxAttempts: number;
@@ -100,7 +100,7 @@ export class Game {
     }
   }
 
-  public async submitGuess(name: string, currentTime: number = 0) {
+  public async submitGuess(currentTime: number = 0) {
     if (this.gameState !== GameState.Playing) return;
     if (!this.guess.isFilled) return;
     if (!this.isValidWord(this.guess)) {
