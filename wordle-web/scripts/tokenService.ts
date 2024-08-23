@@ -40,6 +40,14 @@ export default class TokenService {
     return JSON.parse(atob(token.split(".")[1])).userName;
   }
 
+  public getUserId() {
+    const token = this.getToken();
+    if (token === "") {
+      return "";
+    }
+    return JSON.parse(atob(token.split(".")[1])).userId;
+  }
+
   public canDeleteAndAdd() {
     const token = this.getToken();
     if (token === "") {

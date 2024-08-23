@@ -58,10 +58,6 @@
             <v-icon> mdi-flag-variant</v-icon>
             This will restart your game if you wish to reset and start over.
           </v-card-text>
-          <v-card-text>
-            <v-icon> mdi-account</v-icon>
-            Save your name for our leaderboard. Have fun!
-          </v-card-text>
         </v-card>
       </v-col>
     </v-row>

@@ -10,7 +10,7 @@
       width="75%"
     />
     <div v-else>
-      <div class="text-h3 ma-5 font-weight-bold text-primary">
+      <div class="text-h4 my-5 font-weight-bold text-primary">
         Last Ten Wordles
       </div>
       <v-row>

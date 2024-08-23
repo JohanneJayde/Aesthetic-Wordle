@@ -22,25 +22,26 @@
     </v-sheet>
     <v-card-item>
       <v-row no-gutters>
-        <v-col cols="12" class="mb-2">
-          <span class="mb-2"
+        <v-col cols="12" class="mb-3">
+          <span><b>Win Percentage:</b> {{ winPercentage }}%</span>
+          <v-progress-linear
+            :model-value="winPercentage"
+            color="win"
+            height="10"
+          />
+        </v-col>
+        <v-col cols="12" class="mb-3">
+          <span
             ><b>Average Attempts:</b>
             {{ gameStat.averageGuesses.toFixed(2) }}</span
           >
           <v-progress-linear
             :model-value="averageAttempts"
-            color="win"
-            height="10"
-          />
-        </v-col>
-        <v-col cols="12" class="mb-2">
-          <span class="mb-2"><b>Win Percentage:</b> {{ winPercentage }}%</span>
-          <v-progress-linear
-            :model-value="winPercentage"
             color="warning"
             height="10"
           />
         </v-col>
+
         <v-col>
           <v-list>
             <span>
