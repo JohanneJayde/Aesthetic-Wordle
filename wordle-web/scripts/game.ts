@@ -1,8 +1,6 @@
 import { LetterState, type Letter } from "./letter";
 import { Word } from "./word";
-import Axios from "axios";
 import type { GameStateDto } from "~/Models/GameStateDto";
-import TokenService from "../Services/tokenService";
 import GameService from "~/Services/GameService";
 
 export class Game {
@@ -11,16 +9,9 @@ export class Game {
   public guessIndex: number = 0;
   public gameState: GameState = GameState.Playing;
   public guessedLetters: Letter[] = [];
-  private _secretWordId: number = -1;
+  private secretWordId: number = -1;
   private _solution: string | null = null;
   public wordsList: string[] = [];
-
-  private set secretWordId(value: number) {
-    this._secretWordId = value;
-  }
-  public get secretWordId(): number {
-    return this._secretWordId;
-  }
 
   public get solution(): string | null {
     return this._solution;
@@ -31,11 +22,12 @@ export class Game {
     this.gameState = GameState.Initializing;
   }
 
-  public async startNewGame(wordId: number) {
+  public async startNewGame(wordId: number, words: string[]) {
     this.secretWordId = wordId;
 
     this.guessIndex = 0;
     this.guessedLetters = [];
+    this.wordsList = words;
 
     this.guesses = [];
     for (let i = 0; i < this.maxAttempts; i++) {
@@ -43,10 +35,6 @@ export class Game {
     }
 
     this.gameState = GameState.Playing;
-  }
-
-  public setWordsList(words: string[]) {
-    this.wordsList = words;
   }
 
   public get guess() {
@@ -112,7 +100,7 @@ export class Game {
 
     this.updateGuessedLetters();
 
-    if (state?.isWin) {
+    if (state.isWin) {
       this.gameState = GameState.Won;
     } else {
       if (this.guessIndex === this.maxAttempts - 1) {

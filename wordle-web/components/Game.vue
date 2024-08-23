@@ -194,12 +194,10 @@ const stopwatch = ref(new Stopwatch());
 
 const option = ref<string | null>();
 
-game.startNewGame(wordId);
-
 function closeGameDialog() {
   isGameOver.value = false;
   setTimeout(() => {
-    game.startNewGame(wordId);
+    game.startNewGame(wordId, wordsList.value);
   }, 300);
   stopwatch.value.reset();
   stopwatch.value.start();
@@ -298,8 +296,9 @@ onMounted(async () => {
       wordsList.value = data.items.map((word: WordDto) =>
         word.word.toLowerCase()
       );
-      game.setWordsList(wordsList.value);
+      game.startNewGame(wordId, wordsList.value);
     });
+
   if (props.isDaily) {
     option.value = date;
   } else {
