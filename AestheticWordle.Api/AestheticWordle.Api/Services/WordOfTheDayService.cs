@@ -1,7 +1,6 @@
 using AestheticWordle.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using AestheticWordle.Api.Dtos;
-using AestheticWordle.Api.Models;
 
 namespace AestheticWordle.Api.Services;
 
@@ -82,7 +81,8 @@ public class WordOfTheDayService(AppDbContext Db)
 
     }
 
-    public async Task<bool> Exists(string word){
+    public async Task<bool> Exists(string word)
+    {
 
         Word? validWord = await Db.Words.FirstOrDefaultAsync(w => w.Text == word);
 

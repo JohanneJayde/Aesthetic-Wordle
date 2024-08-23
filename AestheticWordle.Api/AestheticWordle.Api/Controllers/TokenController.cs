@@ -7,7 +7,6 @@ using System.Security.Claims;
 using System.Text;
 using AestheticWordle.Api.Dtos;
 using AestheticWordle.Api.Identity;
-using AestheticWordle.Api.Models;
 
 namespace AestheticWordle.Api.Controllers;
 

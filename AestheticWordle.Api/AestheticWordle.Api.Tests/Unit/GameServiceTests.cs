@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using AestheticWordle.Api.Dtos;
 using AestheticWordle.Api.Models;
+using AestheticWordle.Api.Services;
 
 namespace AestheticWordle.Api.Tests.Unit;
 

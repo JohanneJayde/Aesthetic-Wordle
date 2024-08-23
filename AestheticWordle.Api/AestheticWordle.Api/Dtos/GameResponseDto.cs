@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using AestheticWordle.Api.Models;
-
-namespace AestheticWordle.Api.Dtos;
+﻿namespace AestheticWordle.Api.Dtos;
 
 public class GameResponseDto
 {

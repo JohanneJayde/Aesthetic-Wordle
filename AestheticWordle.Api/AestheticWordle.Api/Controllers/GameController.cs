@@ -86,7 +86,7 @@ public class GameController(GameService gameService, WordOfTheDayService wordofT
     [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> IsValidWord(string wordToValidate)
     {
-        if(string.IsNullOrEmpty(wordToValidate) || wordToValidate.Length > 5)
+        if (string.IsNullOrEmpty(wordToValidate) || wordToValidate.Length > 5)
         {
             return Ok(false);
         }

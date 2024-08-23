@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using AestheticWordle.Api.Dtos;
-using AestheticWordle.Api.Identity;
-using AestheticWordle.Api.Models;
 
 namespace AestheticWordle.Api.Controllers;
 

@@ -7,7 +7,6 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using AestheticWordle.Api;
 using AestheticWordle.Api.Identity;
-using AestheticWordle.Api.Models;
 using AestheticWordle.Api.Services;
 
 var AllOrigins = "AllOrigins";
@@ -35,7 +34,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(config =>
     {
-        config.SwaggerDoc("v1", new OpenApiInfo { Title = "Wordle API", Version = "v1" });
+        config.SwaggerDoc("v1", new OpenApiInfo { Title = "Aesthetic Wordle API", Version = "v1" });
         config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
             Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
@@ -70,7 +69,7 @@ builder.Services.AddScoped<UserService>();
 // Identity Services
 builder.Services.AddIdentityCore<AppUser>(options => options.SignIn.RequireConfirmedAccount = false)
     .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<AppDbContext>(); // Tell identity where to sstore things
+    .AddEntityFrameworkStores<AppDbContext>();
 
 // JWT Token Setup
 JwtConfiguration jwtConfig = builder.Configuration

@@ -1,9 +1,9 @@
-﻿namespace AestheticWordle.Api.Dtos
-{
-    public class AppUserDto
-    {
-        public string Id { get; set; } = null!;
+﻿namespace AestheticWordle.Api.Dtos;
 
-        public string UserName { get; set; } = null!;
-    }
+public class AppUserDto
+{
+    public string Id { get; set; } = null!;
+
+    public string UserName { get; set; } = null!;
 }
+
