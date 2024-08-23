@@ -138,7 +138,7 @@
 <script setup lang="ts">
 import type { WordDto } from "~/Models/WordDto";
 import Axios from "axios";
-import TokenService from "~/scripts/TokenService";
+import TokenService from "~/scripts/tokenService";
 
 const wordsList: Ref<WordDto[]> = ref([]);
 const isWordsListLoading = ref(true);

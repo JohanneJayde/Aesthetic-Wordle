@@ -5,6 +5,7 @@
       color="primary"
       indeterminate
     />
+
     <v-sheet v-else color="transparent">
       <div
         v-if="isDaily"
@@ -233,10 +234,11 @@ watch(
   }
 );
 
-function handleClick(value: string) {
+async function handleClick(value: string) {
   if (value === "ENTER") {
     let currentGuessIndex = game.guessIndex;
-    game.submitGuess(stopwatch.value.getCurrentTime());
+    await game.submitGuess(stopwatch.value.getCurrentTime());
+
     if (currentGuessIndex !== game.guessIndex) {
       playEnterSound(volumne.value);
     }

@@ -7,10 +7,10 @@
             {{ userData.userName }}'s Stats
           </v-card-title>
           <v-card-text>
-            Total Games Played: {{ userData.gameCount }}
+            <b>Total Games Played:</b> {{ userData.gameCount }}
           </v-card-text>
           <v-card-text>
-            Average Seconds Per Game:
+            <b> Average Seconds Per Game:</b>
             {{ userData.averageSecondsPerGame }}
           </v-card-text>
         </v-card>
@@ -25,13 +25,13 @@
               <v-card-item>
                 <v-progress-circular
                   :rotate="360"
-                  :width="20"
+                  :width="15"
                   color="warning"
                   class="mx-auto font-weight-bold d-flex justify-center align-center"
                   size="100"
                   :model-value="(userData.averageAttempts / 6) * 100"
                 >
-                  {{ userData.averageAttempts }}</v-progress-circular
+                  {{ userData.averageAttempts.toFixed(2) }}</v-progress-circular
                 >
               </v-card-item>
             </v-card>
@@ -44,7 +44,7 @@
               <v-card-item>
                 <v-progress-circular
                   :rotate="360"
-                  :width="20"
+                  :width="15"
                   color="win"
                   class="mx-auto font-weight-bold d-flex justify-center align-center"
                   size="100"
@@ -55,9 +55,11 @@
                   "
                 >
                   {{
-                    (userData.games.filter((g) => g.isWin).length /
-                      userData.gameCount) *
-                    100
+                    (
+                      (userData.games.filter((g) => g.isWin).length /
+                        userData.gameCount) *
+                      100
+                    ).toFixed(2)
                   }}%</v-progress-circular
                 >
               </v-card-item>
@@ -66,29 +68,33 @@
         </v-row>
       </v-col>
     </v-row>
-    <v-table>
-      <thead>
-        <tr class="bg-primary">
-          <th>Date Played</th>
-          <th>Win</th>
-          <th>Attempts</th>
-          <th>Seconds</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="game in userData.games" :key="game.id">
-          <td>{{ ordinalDate(game.dateAttempted) }}</td>
+    <v-row>
+      <v-col>
+        <v-table>
+          <thead>
+            <tr class="bg-primary">
+              <th>Date Played</th>
+              <th>Win</th>
+              <th>Attempts</th>
+              <th>Seconds</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="game in userData.games" :key="game.id">
+              <td>{{ ordinalDate(game.dateAttempted) }}</td>
 
-          <td>
-            <v-icon :color="game.isWin ? 'green' : 'red'">{{
-              game.isWin ? "mdi-check" : "mdi-close"
-            }}</v-icon>
-          </td>
-          <td>{{ game.attempts }}</td>
-          <td>{{ game.seconds }}</td>
-        </tr>
-      </tbody>
-    </v-table>
+              <td>
+                <v-icon :color="game.isWin ? 'green' : 'red'">{{
+                  game.isWin ? "mdi-check" : "mdi-close"
+                }}</v-icon>
+              </td>
+              <td>{{ game.attempts }}</td>
+              <td>{{ game.seconds }}</td>
+            </tr>
+          </tbody>
+        </v-table>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 

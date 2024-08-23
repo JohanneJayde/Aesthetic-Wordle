@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Wordle.Api.Dtos;
 using Wordle.Api.Models;
 
 namespace Wordle.Api.Services;
 
-public class UserService(AppDbContext context, UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager)
+public class UserService(AppDbContext context)
 {
     public async Task<UserResponseDto?> GetAppUserById(string userId)
     {

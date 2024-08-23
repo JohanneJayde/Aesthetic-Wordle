@@ -85,6 +85,7 @@
         v-if="isDaily"
         class="pa-2 ml-2 mb-3 bg-primary"
         color="white"
+        :disabled="hasPlayed"
         :to="`/Wordle/Daily?date=${formattedDate}`"
         >Play Word</v-btn
       >
@@ -97,7 +98,7 @@
 import { addDays } from "date-fns";
 import type { GameStats } from "~/Models/GameStas";
 import dateUtils from "~/scripts/dateUtils";
-import TokenService from "~/scripts/TokenService";
+import TokenService from "~/scripts/tokenService";
 
 const props = withDefaults(
   defineProps<{

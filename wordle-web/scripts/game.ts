@@ -2,7 +2,7 @@ import { LetterState, type Letter } from "./letter";
 import { Word } from "./word";
 import Axios from "axios";
 import type { GameStateDto } from "~/Models/GameStateDto";
-import TokenService from "./TokenService";
+import TokenService from "./tokenService";
 
 export class Game {
   public maxAttempts: number;
