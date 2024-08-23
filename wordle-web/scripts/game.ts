@@ -11,7 +11,6 @@ export class Game {
   public gameState: GameState = GameState.Playing;
   public guessedLetters: Letter[] = [];
   public isBusy: boolean = false;
-  public playerNmae: string = "";
   private _secretWordId: number = -1;
   private _solution: string | null = null;
   public wordsList: string[] = [];
