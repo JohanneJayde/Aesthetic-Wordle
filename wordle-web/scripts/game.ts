@@ -2,7 +2,8 @@ import { LetterState, type Letter } from "./letter";
 import { Word } from "./word";
 import Axios from "axios";
 import type { GameStateDto } from "~/Models/GameStateDto";
-import TokenService from "./tokenService";
+import TokenService from "../Services/tokenService";
+import GameService from "~/Services/GameService";
 
 export class Game {
   public maxAttempts: number;
@@ -33,18 +34,13 @@ export class Game {
     this.gameState = GameState.Initializing;
   }
 
-  public async startNewGame(date?: string | undefined) {
+  public async startNewGame(wordId: number) {
     this.isBusy = true;
+
+    this.secretWordId = wordId;
 
     this.guessIndex = 0;
     this.guessedLetters = [];
-
-    // Get a word
-    if (date) {
-      this.secretWordId = await this.getWordOfTheDayFromApi(date);
-    } else {
-      this.secretWordId = await this.getRadnomWordFromApi();
-    }
 
     this.guesses = [];
     for (let i = 0; i < this.maxAttempts; i++) {
@@ -159,42 +155,7 @@ export class Game {
     attemptNumber: number,
     wordId: number
   ): Promise<GameStateDto> {
-    const response = await Axios.post("/Game/Guess", {
-      guess: guess,
-      attemptNumber: attemptNumber,
-      wordId: wordId,
-    });
-
-    return response.data;
-  }
-
-  public async getWordOfTheDayFromApi(date: string): Promise<number> {
-    try {
-      let wordUrl = "word/wordOfTheDay/" + date;
-
-      const response = await Axios.get(wordUrl);
-
-      return response.data;
-    } catch (error) {
-      console.error("Error fetching word of the day:", error);
-      return -1; // Probably best to print the error on screen, but this is kind of funny. :)
-    }
-  }
-
-  public async getRadnomWordFromApi(): Promise<number> {
-    let result: number = -1;
-
-    try {
-      let wordUrl = "word/randomWord";
-
-      const response = await Axios.get(wordUrl);
-
-      result = response.data;
-    } catch (error) {
-      console.error("Error fetching random word:", error);
-    }
-
-    return result;
+    return await GameService.validateGuess(guess, attemptNumber, wordId);
   }
 
   public isValidWord(word: Word): boolean {

@@ -98,7 +98,7 @@
 import { addDays } from "date-fns";
 import type { GameStats } from "~/Models/GameStas";
 import dateUtils from "~/scripts/dateUtils";
-import TokenService from "~/scripts/tokenService";
+import TokenService from "~/Services/tokenService";
 
 const props = withDefaults(
   defineProps<{

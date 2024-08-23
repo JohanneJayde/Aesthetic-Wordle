@@ -153,6 +153,7 @@ import {
   playWinSound,
 } from "../scripts/soundUtils";
 import type { WordDto } from "~/Models/WordDto";
+import { WordService } from "~/Services/WordService";
 
 const props = withDefaults(
   defineProps<{
@@ -173,6 +174,16 @@ const date = route.query.date?.toString();
 const volumne = ref(0.5);
 const wordsList = ref<string[]>([]);
 
+const wordId = await getWordId();
+
+function getWordId() {
+  if (props.isDaily) {
+    return WordService.getWordOfTheDayFromApi(date!);
+  } else {
+    return WordService.getRadnomWordFromApi();
+  }
+}
+
 const game = reactive(new Game());
 const validWordsNum = computed(() => game.filterValidWords().length);
 provide("GAME", game);
@@ -180,12 +191,12 @@ const stopwatch = ref(new Stopwatch());
 
 const option = ref<string | null>();
 
-game.startNewGame(date);
+game.startNewGame(wordId);
 
 function closeGameDialog() {
   isGameOver.value = false;
   setTimeout(() => {
-    game.startNewGame(date);
+    game.startNewGame(wordId);
   }, 300);
   stopwatch.value.reset();
   stopwatch.value.start();
