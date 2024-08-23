@@ -55,10 +55,11 @@
                   "
                 >
                   {{
-                    (
-                      (userData.games.filter((g) => g.isWin).length /
-                        userData.gameCount) *
-                      100
+                    (userData.gameCount == 0
+                      ? 0.0
+                      : (userData.games.filter((g) => g.isWin).length /
+                          userData.gameCount) *
+                        100
                     ).toFixed(2)
                   }}%</v-progress-circular
                 >

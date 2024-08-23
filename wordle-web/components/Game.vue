@@ -237,7 +237,7 @@ async function stopGame() {
 
   if (tokenService.isLoggedIn()) {
     await GameService.submitGame(
-      game.guessIndex + 1,
+      game.guessIndex,
       wordId,
       game.gameState === GameState.Won,
       stopwatch.value.getCurrentTime(),
@@ -263,7 +263,7 @@ async function handleClick(value: string) {
   if (value === "ENTER") {
     const wasGuessSubmitted = await submitGuess();
 
-    if (wasGuessSubmitted) {
+    if (wasGuessSubmitted && game.gameState === GameState.Playing) {
       playEnterSound(volumne.value);
     } else {
       game.guess.clear();
