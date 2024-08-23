@@ -10,7 +10,7 @@
       <Property Name="WordOfTheDayGames" />
     </ShowAsCollectionAssociation>
   </Class>
-  <Class Name="Wordle.Api.Models.WordOfTheDayGame">
+  <Class Name="AestheticWordle.Api.Models.WordOfTheDayGame">
     <Position X="7.5" Y="3.5" Width="2" />
     <TypeIdentifier>
       <HashCode>AAAAAQgAAAAAAAAAAAAAAAABAAAAAAAABAAAAAECAAA=</HashCode>

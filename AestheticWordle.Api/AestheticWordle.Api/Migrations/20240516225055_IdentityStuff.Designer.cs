@@ -158,7 +158,7 @@ namespace AestheticWordle.Api.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Wordle.Api.Models.AppUser", b =>
+            modelBuilder.Entity("AestheticWordle.Api.Models.AppUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -232,7 +232,7 @@ namespace AestheticWordle.Api.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("Wordle.Api.Models.Game", b =>
+            modelBuilder.Entity("AestheticWordle.Api.Models.Game", b =>
                 {
                     b.Property<int>("GameId")
                         .ValueGeneratedOnAdd()
@@ -264,7 +264,7 @@ namespace AestheticWordle.Api.Migrations
                     b.ToTable("Games");
                 });
 
-            modelBuilder.Entity("Wordle.Api.Models.Word", b =>
+            modelBuilder.Entity("AestheticWordle.Api.Models.Word", b =>
                 {
                     b.Property<int>("WordId")
                         .ValueGeneratedOnAdd()
@@ -281,7 +281,7 @@ namespace AestheticWordle.Api.Migrations
                     b.ToTable("Words");
                 });
 
-            modelBuilder.Entity("Wordle.Api.Models.WordOfTheDay", b =>
+            modelBuilder.Entity("AestheticWordle.Api.Models.WordOfTheDay", b =>
                 {
                     b.Property<int>("WordOfTheDayId")
                         .ValueGeneratedOnAdd()
@@ -313,7 +313,7 @@ namespace AestheticWordle.Api.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("Wordle.Api.Models.AppUser", null)
+                    b.HasOne("AestheticWordle.Api.Models.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -322,7 +322,7 @@ namespace AestheticWordle.Api.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("Wordle.Api.Models.AppUser", null)
+                    b.HasOne("AestheticWordle.Api.Models.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -337,7 +337,7 @@ namespace AestheticWordle.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Wordle.Api.Models.AppUser", null)
+                    b.HasOne("AestheticWordle.Api.Models.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -346,22 +346,22 @@ namespace AestheticWordle.Api.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("Wordle.Api.Models.AppUser", null)
+                    b.HasOne("AestheticWordle.Api.Models.AppUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Wordle.Api.Models.Game", b =>
+            modelBuilder.Entity("AestheticWordle.Api.Models.Game", b =>
                 {
-                    b.HasOne("Wordle.Api.Models.Word", "Word")
+                    b.HasOne("AestheticWordle.Api.Models.Word", "Word")
                         .WithMany("Games")
                         .HasForeignKey("WordId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Wordle.Api.Models.WordOfTheDay", "WordOfTheDay")
+                    b.HasOne("AestheticWordle.Api.Models.WordOfTheDay", "WordOfTheDay")
                         .WithMany("Games")
                         .HasForeignKey("WordOfTheDayId");
 
@@ -370,9 +370,9 @@ namespace AestheticWordle.Api.Migrations
                     b.Navigation("WordOfTheDay");
                 });
 
-            modelBuilder.Entity("Wordle.Api.Models.WordOfTheDay", b =>
+            modelBuilder.Entity("AestheticWordle.Api.Models.WordOfTheDay", b =>
                 {
-                    b.HasOne("Wordle.Api.Models.Word", "Word")
+                    b.HasOne("AestheticWordle.Api.Models.Word", "Word")
                         .WithMany("WordsOfTheDays")
                         .HasForeignKey("WordId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -381,14 +381,14 @@ namespace AestheticWordle.Api.Migrations
                     b.Navigation("Word");
                 });
 
-            modelBuilder.Entity("Wordle.Api.Models.Word", b =>
+            modelBuilder.Entity("AestheticWordle.Api.Models.Word", b =>
                 {
                     b.Navigation("Games");
 
                     b.Navigation("WordsOfTheDays");
                 });
 
-            modelBuilder.Entity("Wordle.Api.Models.WordOfTheDay", b =>
+            modelBuilder.Entity("AestheticWordle.Api.Models.WordOfTheDay", b =>
                 {
                     b.Navigation("Games");
                 });

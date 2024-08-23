@@ -25,7 +25,7 @@ namespace AestheticWordle.Api.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Wordle.Api.Models.WordOfTheDay", b =>
+            modelBuilder.Entity("AestheticWordle.Api.Models.WordOfTheDay", b =>
                 {
                     b.Property<int>("WordOfTheDayId")
                         .ValueGeneratedOnAdd()
