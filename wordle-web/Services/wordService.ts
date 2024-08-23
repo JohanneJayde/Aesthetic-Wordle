@@ -1,6 +1,6 @@
 import Axios from "axios";
 
-export class WordService {
+export default class WordService {
   private static controllerEndPoint: string = "word";
 
   public static async getWordOfTheDayFromApi(date: string): Promise<number> {

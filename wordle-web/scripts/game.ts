@@ -20,9 +20,7 @@ export class Game {
     this.gameState = GameState.Initializing;
   }
 
-  public async startNewGame(wordId: number, words: string[]) {
-    this.secretWordId = wordId;
-
+  public async startNewGame(words: string[]) {
     this.guessIndex = 0;
     this.guessedLetters = [];
     this.wordsList = words;

@@ -5,7 +5,6 @@
       color="primary"
       indeterminate
     />
-
     <v-sheet v-else color="transparent">
       <div
         v-if="isDaily"
@@ -107,7 +106,7 @@
         :color="gameStateColor"
         action="Restart"
         actionIcon="mdi-restart"
-        @closePopUp="closeGameDialog()"
+        @closePopUp="restartGame"
       >
         <template #content>
           <span v-if="game.gameState !== GameState.Playing">
@@ -147,9 +146,7 @@ import {
   playWinSound,
 } from "../scripts/soundUtils";
 import type { WordDto } from "~/Models/WordDto";
-import { WordService } from "~/Services/WordService";
-import GameService from "~/Services/GameService";
-import TokenService from "~/Services/tokenService";
+import { WordService, GameService, TokenService } from "@/services";
 
 const props = withDefaults(
   defineProps<{
@@ -174,28 +171,6 @@ const game = reactive(new Game());
 const validWordsNum = computed(() => game.filterValidWords().length);
 provide("GAME", game);
 const stopwatch = ref(new Stopwatch());
-
-function closeGameDialog() {
-  setTimeout(() => {
-    game.startNewGame(wordId, wordsList.value);
-  }, 300);
-  stopwatch.value.reset();
-  stopwatch.value.start();
-}
-
-const formattedDate = computed(() => {
-  return dateUtils.getFormattedDateWithOrdianl(addDays(new Date(date!), 1));
-});
-
-watch(itemSelect, () => {
-  if (itemSelect.value === "showWordsList") {
-    showWordsList.value = true;
-  } else if (itemSelect.value === "showResult") {
-    isGameOver.value = true;
-  }
-
-  itemSelect.value = "";
-});
 
 const gameMessage = computed(() => {
   switch (game.gameState) {
@@ -238,6 +213,16 @@ watch(
   }
 );
 
+watch(itemSelect, () => {
+  if (itemSelect.value === "showWordsList") {
+    showWordsList.value = true;
+  } else if (itemSelect.value === "showResult") {
+    isGameOver.value = true;
+  }
+
+  itemSelect.value = "";
+});
+
 async function getWordId() {
   if (props.isDaily) {
     return await WordService.getWordOfTheDayFromApi(date!);
@@ -260,6 +245,18 @@ async function stopGame() {
     );
   }
 }
+
+function restartGame() {
+  setTimeout(() => {
+    game.startNewGame(wordsList.value);
+  }, 300);
+  stopwatch.value.reset();
+  stopwatch.value.start();
+}
+
+const formattedDate = computed(() => {
+  return dateUtils.getFormattedDateWithOrdianl(addDays(new Date(date!), 1));
+});
 
 async function handleClick(value: string) {
   if (value === "ENTER") {
@@ -304,7 +301,7 @@ onMounted(async () => {
       wordsList.value = data.items.map((word: WordDto) =>
         word.word.toLowerCase()
       );
-      game.startNewGame(wordId, wordsList.value);
+      game.startNewGame(wordsList.value);
     });
 });
 </script>

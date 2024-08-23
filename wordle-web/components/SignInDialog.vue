@@ -131,7 +131,7 @@
 
 <script setup lang="ts">
 import axios from "axios";
-import TokenService from "~/Services/tokenService";
+import TokenService from "~/services/tokenService";
 import { useRouter } from "vue-router";
 
 const router = useRouter();

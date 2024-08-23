@@ -79,7 +79,7 @@
 import { useTheme } from "vuetify";
 import nuxtStorage from "nuxt-storage";
 import dateUtils from "./scripts/dateUtils";
-import TokenService from "./Services/tokenService";
+import { TokenService } from "@/services";
 
 const router = useRouter();
 
