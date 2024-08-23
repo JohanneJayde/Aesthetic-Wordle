@@ -13,7 +13,7 @@
         <v-btn
           :prepend-icon="actionIcon"
           variant="outlined"
-          @click="(modelValue = false), emits('closePopUp')"
+          @click="emits('closePopUp')"
         >
           {{ action }}
         </v-btn>

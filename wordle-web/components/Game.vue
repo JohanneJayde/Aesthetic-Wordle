@@ -247,6 +247,7 @@ async function stopGame() {
 }
 
 function restartGame() {
+  isGameOver.value = false;
   setTimeout(() => {
     game.startNewGame(wordsList.value);
   }, 300);
