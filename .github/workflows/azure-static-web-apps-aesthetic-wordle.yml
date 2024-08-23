@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "wordle-web/**"
+      - "AestheticWordle.Web/**"
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
@@ -29,18 +29,18 @@ jobs:
           node-version: 18
       - name: Install Packages
         run: npm ci
-        working-directory: ./wordle-web
+        working-directory: ./AestheticWordle.Web
       - name: Generate
         run: npm run generate
-        working-directory: ./wordle-web
+        working-directory: ./AestheticWordle.Web
       - name: Run Vitest
         run: npm run test
-        working-directory: ./wordle-web
+        working-directory: ./AestheticWordle.Web
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
           name: build-output
-          path: ./wordle-web/.output/public
+          path: ./AestheticWordle.Web/.output/public
   deploy:
     needs: build_and_test
     runs-on: ubuntu-latest
@@ -51,7 +51,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: build-output
-          path: ./wordle-web/.output/public
+          path: ./AestheticWordle.Web/.output/public
       - name: Build And Deploy
         uses: Azure/static-web-apps-deploy@v1
         with:
@@ -60,6 +60,6 @@ jobs:
           action: "upload"
           ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
           # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "./wordle-web/.output/public" # App source code path
+          app_location: "./AestheticWordle.Web/.output/public" # App source code path
           output_location: "" # Built app content directory - optional
           ###### End of Repository/Build Configurations ######

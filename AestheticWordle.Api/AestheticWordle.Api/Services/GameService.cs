@@ -1,7 +1,6 @@
 ﻿using AestheticWordle.Api.Models;
 using Microsoft.EntityFrameworkCore;
 using AestheticWordle.Api.Dtos;
-using AestheticWordle.Api.Models;
 
 namespace AestheticWordle.Api.Services;
 public class GameService(AppDbContext db)

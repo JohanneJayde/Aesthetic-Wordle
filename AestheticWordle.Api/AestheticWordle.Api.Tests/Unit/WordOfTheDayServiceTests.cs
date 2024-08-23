@@ -1,7 +1,7 @@
 using AestheticWordle.Api.Models;
-using AestheticWordle.Api.Tests;
+using AestheticWordle.Api.Services;
 
-namespace AestheticWordle.Api.Tests;
+namespace AestheticWordle.Api.Tests.Unit;
 
 [TestClass]
 public class WordOfTheDayServiceTests : DatabaseTestBase
