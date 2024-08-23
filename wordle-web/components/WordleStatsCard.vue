@@ -21,63 +21,73 @@
       </v-row>
     </v-sheet>
     <v-card-item>
-      <v-row>
-        <v-col cols="6" lg="12" xl="5" md="12">
-          <v-list density="compact">
-            <v-list-item class="font-weight-bold"
-              >Total Wins: {{ gameStat.totalWins }}</v-list-item
-            >
-            <v-list-item class="font-weight-bold"
-              >Total Losses: {{ gameStat.totalLosses }}</v-list-item
-            >
-            <v-list-item class="font-weight-bold"
-              >Average Seconds:
-              {{ gameStat.averageSeconds.toFixed(2) }}</v-list-item
-            >
-            <v-list-item class="font-weight-bold"
-              >User Plays: {{ gameStat.users.length }}</v-list-item
-            >
-          </v-list>
+      <v-row no-gutters>
+        <v-col cols="12" class="mb-2">
+          <span class="mb-2"
+            ><b>Average Attempts:</b>
+            {{ gameStat.averageGuesses.toFixed(2) }}</span
+          >
+          <v-progress-linear
+            :model-value="averageAttempts"
+            color="win"
+            height="10"
+          />
         </v-col>
-        <v-col cols="6" class="d-flex" lg="12" xl="7" md="12">
-          <v-col class="d-flex flex-column">
-            <span class="font-weight-bold text-center mb-2">Attempts</span>
-            <v-progress-circular
-              :rotate="360"
-              :width="10"
-              color="win"
-              class="mx-auto font-weight-bold d-flex justify-center align-center"
-              size="80"
-              :model-value="averageAttempts"
-            >
-              {{ averageAttempts }}%</v-progress-circular
-            >
-          </v-col>
-          <v-col class="d-flex flex-column">
-            <span class="font-weight-bold text-center mb-2">Win %</span>
-            <v-progress-circular
-              :rotate="360"
-              :width="10"
-              color="warning"
-              class="mx-auto font-weight-bold d-flex justify-center align-center"
-              size="80"
-              :model-value="winPercentage"
-            >
-              {{ winPercentage }}%</v-progress-circular
-            >
-          </v-col>
+        <v-col cols="12" class="mb-2">
+          <span class="mb-2"><b>Win Percentage:</b> {{ winPercentage }}%</span>
+          <v-progress-linear
+            :model-value="winPercentage"
+            color="warning"
+            height="10"
+          />
+        </v-col>
+        <v-col>
+          <v-list>
+            <span>
+              <b
+                >Total Wins
+                <v-icon icon="mdi-trophy" color="primary" size="small" />:</b
+              >
+              {{ gameStat.totalWins }} </span
+            ><br />
+            <span>
+              <b
+                >Total Losses
+                <v-icon icon="mdi-close" color="primary" size="small" />:</b
+              >
+              {{ gameStat.totalLosses }} </span
+            ><br />
+            <span>
+              <b
+                >Average Seconds
+                <v-icon icon="mdi-clock" color="primary" size="small" />:</b
+              >
+              {{ gameStat.averageSeconds.toFixed(2) }} </span
+            ><br />
+            <span>
+              <b
+                >User Plays
+                <v-icon
+                  icon="mdi-account-multiple"
+                  color="primary"
+                  size="small"
+                />:</b
+              >
+              {{ gameStat.users.length }} </span
+            ><br />
+          </v-list>
         </v-col>
       </v-row>
     </v-card-item>
     <v-card-actions>
       <v-btn
         v-if="isDaily"
-        class="pa-2 ml-4 mb-3 bg-primary"
+        class="pa-2 ml-2 mb-3 bg-primary"
         color="white"
         :to="`/Wordle/Daily?date=${formattedDate}`"
         >Play Word</v-btn
-      ></v-card-actions
-    >
+      >
+    </v-card-actions>
     <v-sheet color="primary" height="5px" class="mb-0" />
   </v-card>
 </template>
